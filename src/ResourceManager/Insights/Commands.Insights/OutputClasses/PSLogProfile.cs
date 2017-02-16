@@ -13,8 +13,6 @@
 // ----------------------------------------------------------------------------------
 
 using Microsoft.Azure.Management.Insights.Models;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Microsoft.Azure.Commands.Insights.OutputClasses
 {

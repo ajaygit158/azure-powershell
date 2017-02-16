@@ -30,7 +30,7 @@ namespace Microsoft.Azure.Commands.Insights.Test.Diagnostics
     public class SetDiagnosticSettingCommandTests
     {
         private readonly SetAzureRmDiagnosticSettingCommand cmdlet;
-        private readonly Mock<InsightsManagementClient> insightsManagementClientMock;
+        private readonly Mock<MonitorManagementClient> insightsManagementClientMock;
         private readonly Mock<IServiceDiagnosticSettingsOperations> insightsDiagnosticsOperationsMock;
         private Mock<ICommandRuntime> commandRuntimeMock;
         private const string resourceId = "/subscriptions/123/resourcegroups/rg/providers/rp/resource/myresource";
@@ -44,12 +44,12 @@ namespace Microsoft.Azure.Commands.Insights.Test.Diagnostics
         public SetDiagnosticSettingCommandTests(Xunit.Abstractions.ITestOutputHelper output)
         {
             this.insightsDiagnosticsOperationsMock = new Mock<IServiceDiagnosticSettingsOperations>();
-            this.insightsManagementClientMock = new Mock<InsightsManagementClient>();
+            this.insightsManagementClientMock = new Mock<MonitorManagementClient>();
             this.commandRuntimeMock = new Mock<ICommandRuntime>();
             this.cmdlet = new SetAzureRmDiagnosticSettingCommand()
             {
                 CommandRuntime = commandRuntimeMock.Object,
-                InsightsManagementClient = insightsManagementClientMock.Object
+                MonitorManagementClient = insightsManagementClientMock.Object
             };
 
             this.ExistingSetting = GetDefaultSetting();

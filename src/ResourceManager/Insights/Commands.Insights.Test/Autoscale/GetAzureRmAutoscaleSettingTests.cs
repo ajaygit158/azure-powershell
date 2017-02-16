@@ -31,7 +31,7 @@ namespace Microsoft.Azure.Commands.Insights.Test.Autoscale
     public class GetAzureRmAutoscaleSettingTests
     {
         private readonly GetAzureRmAutoscaleSettingCommand cmdlet;
-        private readonly Mock<InsightsManagementClient> insightsManagementClientMock;
+        private readonly Mock<MonitorManagementClient> insightsManagementClientMock;
         private readonly Mock<IAutoscaleSettingsOperations> insightsAutoscaleOperationsMock;
         private Mock<ICommandRuntime> commandRuntimeMock;
         private Microsoft.Rest.Azure.AzureOperationResponse<AutoscaleSettingResource> responseSimple;
@@ -44,12 +44,12 @@ namespace Microsoft.Azure.Commands.Insights.Test.Autoscale
         {
             //ServiceManagemenet.Common.Models.XunitTracingInterceptor.AddToContext(new ServiceManagemenet.Common.Models.XunitTracingInterceptor(output));
             insightsAutoscaleOperationsMock = new Mock<IAutoscaleSettingsOperations>();
-            insightsManagementClientMock = new Mock<InsightsManagementClient>();
+            insightsManagementClientMock = new Mock<MonitorManagementClient>();
             commandRuntimeMock = new Mock<ICommandRuntime>();
             cmdlet = new GetAzureRmAutoscaleSettingCommand()
             {
                 CommandRuntime = commandRuntimeMock.Object,
-                InsightsManagementClient = insightsManagementClientMock.Object
+                MonitorManagementClient = insightsManagementClientMock.Object
             };
 
             var responseObject = new AutoscaleSettingResource(id: "", location: "", profiles: null, autoscaleSettingResourceName: "")

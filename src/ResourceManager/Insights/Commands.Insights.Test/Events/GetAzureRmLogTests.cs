@@ -31,8 +31,8 @@ namespace Microsoft.Azure.Commands.Insights.Test.Events
     public class GetAzureRmLogTests
     {
         private readonly GetAzureRmLogCommand cmdlet;
-        private readonly Mock<InsightsClient> insightsClientMock;
-        private readonly Mock<IEventsOperations> insightsEventOperationsMock;
+        private readonly Mock<MonitorClient> MonitorClientMock;
+        private readonly Mock<IActivityLogsOperations> insightsEventOperationsMock;
         private Mock<ICommandRuntime> commandRuntimeMock;
         private AzureOperationResponse<IPage<EventData>> response;
         private ODataQuery<EventData> filter;
@@ -41,13 +41,13 @@ namespace Microsoft.Azure.Commands.Insights.Test.Events
         public GetAzureRmLogTests(Xunit.Abstractions.ITestOutputHelper output)
         {
             //ServiceManagemenet.Common.Models.XunitTracingInterceptor.AddToContext(new ServiceManagemenet.Common.Models.XunitTracingInterceptor(output));
-            insightsEventOperationsMock = new Mock<IEventsOperations>();
-            insightsClientMock = new Mock<InsightsClient>();
+            insightsEventOperationsMock = new Mock<IActivityLogsOperations>();
+            MonitorClientMock = new Mock<MonitorClient>();
             commandRuntimeMock = new Mock<ICommandRuntime>();
             cmdlet = new GetAzureRmLogCommand()
             {
                 CommandRuntime = commandRuntimeMock.Object,
-                InsightsClient = insightsClientMock.Object
+                MonitorClient = MonitorClientMock.Object
             };
 
             response = Utilities.InitializeResponse();
@@ -60,7 +60,7 @@ namespace Microsoft.Azure.Commands.Insights.Test.Events
                     selected = s;
                 });
 
-            insightsClientMock.SetupGet(f => f.Events).Returns(this.insightsEventOperationsMock.Object);
+            MonitorClientMock.SetupGet(f => f.ActivityLogs).Returns(this.insightsEventOperationsMock.Object);
         }
 
         [Fact]

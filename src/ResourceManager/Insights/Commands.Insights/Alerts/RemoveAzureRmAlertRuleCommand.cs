@@ -51,7 +51,7 @@ namespace Microsoft.Azure.Commands.Insights.Alerts
         protected override void ProcessRecordInternal()
         {
             WriteWarning("The output of this cmdlet will change. The cmdlet will not return anything in future releases.");
-            var result = this.InsightsManagementClient.AlertRules.DeleteWithHttpMessagesAsync(resourceGroupName: this.ResourceGroup, ruleName: this.Name).Result;
+            var result = this.MonitorManagementClient.AlertRules.DeleteWithHttpMessagesAsync(resourceGroupName: this.ResourceGroup, ruleName: this.Name).Result;
 
             // Keep this response for backwards compatibility.
             // Note: Delete operations return nothing in the new specification.

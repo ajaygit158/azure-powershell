@@ -93,7 +93,7 @@ namespace Microsoft.Azure.Commands.Insights.LogProfiles
             putParameters.ServiceBusRuleId = this.ServiceBusRuleId;
             putParameters.StorageAccountId = this.StorageAccountId;
 
-            LogProfileResource result = this.InsightsManagementClient.LogProfiles.CreateOrUpdateAsync(logProfileName: this.Name, parameters: putParameters, cancellationToken: CancellationToken.None).Result;
+            LogProfileResource result = this.MonitorManagementClient.LogProfiles.CreateOrUpdateAsync(logProfileName: this.Name, parameters: putParameters, cancellationToken: CancellationToken.None).Result;
             WriteObject(new PSLogProfile(result));
         }
     }

@@ -12,8 +12,8 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using Microsoft.Azure.Insights.Legacy.Models;
 using System.Collections.Generic;
+using Microsoft.Azure.Insights.Models;
 
 namespace Microsoft.Azure.Commands.Insights.OutputClasses
 {
@@ -37,7 +37,7 @@ namespace Microsoft.Azure.Commands.Insights.OutputClasses
         /// <returns>A string representation of the list of MetricAvailability objects including indentation</returns>
         public override string ToString()
         {
-            return this.ToString(indentationTabs: 1);
+            return this.ToString(); //indentationTabs: 1);
         }
     }
 }

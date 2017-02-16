@@ -30,7 +30,7 @@ namespace Microsoft.Azure.Commands.Insights
     /// <summary>
     /// Base class for the Azure Insights SDK EventService Cmdlets
     /// </summary>
-    public abstract class EventCmdletBase : InsightsClientCmdletBase
+    public abstract class EventCmdletBase : MonitorClientCmdletBase
     {
         private static readonly TimeSpan MaximumDateDifferenceAllowedInDays = TimeSpan.FromDays(15);
         private static readonly TimeSpan DefaultQueryTimeRange = TimeSpan.FromDays(7);
@@ -213,7 +213,7 @@ namespace Microsoft.Azure.Commands.Insights
             // Call the proper API methods to return a list of raw records. In the future this pattern can be extended to include DigestRecords
             // If fullDetails is present do not select fields, if not present fetch only the SelectedFieldsForQuery
             var query = new ODataQuery<EventData>(queryFilter);
-            IPage<EventData> response = this.InsightsClient.Events.ListAsync(odataQuery: query, select: fullDetails ? null : PSEventDataNoDetails.SelectedFieldsForQuery, cancellationToken: CancellationToken.None).Result;
+            IPage<EventData> response = this.MonitorClient.ActivityLogs.ListAsync(odataQuery: query, select: fullDetails ? null : PSEventDataNoDetails.SelectedFieldsForQuery, cancellationToken: CancellationToken.None).Result;
             var records = new List<IPSEventData>();
             var enumerator = response.GetEnumerator();
             enumerator.ExtractCollectionFromResult(fullDetails: fullDetails, records: records, keepTheRecord: this.KeepTheRecord);
@@ -222,7 +222,7 @@ namespace Microsoft.Azure.Commands.Insights
             // Adding a safety check to stop returning records if too many have been read already.
             while (!string.IsNullOrWhiteSpace(nextLink) && records.Count < maxNumberOfRecords)
             {
-                response = this.InsightsClient.Events.ListNextAsync(nextPageLink: nextLink, cancellationToken: CancellationToken.None).Result;
+                response = this.MonitorClient.ActivityLogs.ListNextAsync(nextPageLink: nextLink, cancellationToken: CancellationToken.None).Result;
                 enumerator.ExtractCollectionFromResult(fullDetails: fullDetails, records: records, keepTheRecord: this.KeepTheRecord);
                 nextLink = response.NextPageLink;
             }

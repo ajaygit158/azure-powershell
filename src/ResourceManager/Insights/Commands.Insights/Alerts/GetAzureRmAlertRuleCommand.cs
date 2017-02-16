@@ -77,7 +77,7 @@ namespace Microsoft.Azure.Commands.Insights.Alerts
             {
                 // Retrieve all the AlertRules for a ResourceGroup
                 ODataQuery<AlertRuleResource> query = new ODataQuery<AlertRuleResource>(this.TargetResourceId);
-                IEnumerable<AlertRuleResource> result = this.InsightsManagementClient.AlertRules.ListByResourceGroupAsync(resourceGroupName: this.ResourceGroup, odataQuery: query).Result;
+                IEnumerable<AlertRuleResource> result = this.MonitorManagementClient.AlertRules.ListByResourceGroupAsync(resourceGroupName: this.ResourceGroup, odataQuery: query).Result;
 
                 var records = result.Select(e => this.DetailedOutput.IsPresent ? (PSManagementItemDescriptor)new PSAlertRule(e) : new PSAlertRuleNoDetails(e));
                 WriteObject(sendToPipeline: records.ToList());
@@ -85,7 +85,7 @@ namespace Microsoft.Azure.Commands.Insights.Alerts
             else
             {
                 // Retrieve a single AlertRule determined by the ResourceGroup and the rule name
-                AlertRuleResource result = this.InsightsManagementClient.AlertRules.GetAsync(resourceGroupName: this.ResourceGroup, ruleName: this.Name).Result;
+                AlertRuleResource result = this.MonitorManagementClient.AlertRules.GetAsync(resourceGroupName: this.ResourceGroup, ruleName: this.Name).Result;
 
                 var finalResult = new List<PSManagementItemDescriptor> { this.DetailedOutput.IsPresent ? (PSManagementItemDescriptor)new PSAlertRule(result) : new PSAlertRuleNoDetails(result) };
                 WriteObject(sendToPipeline: finalResult);

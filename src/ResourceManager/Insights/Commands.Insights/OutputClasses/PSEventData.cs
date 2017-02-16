@@ -48,11 +48,6 @@ namespace Microsoft.Azure.Commands.Insights.OutputClasses
         public string Description { get; set; }
 
         /// <summary>
-        /// Gets or sets the event channels. The regular event logs, that you see in the Azure Management Portals, flow through the 'Operation' channel.
-        /// </summary>
-        public EventChannels EventChannels { get; set; }
-
-        /// <summary>
         /// Gets or sets the event data Id. This is a unique identifier for an event.
         /// </summary>
         public string EventDataId { get; set; }
@@ -155,7 +150,6 @@ namespace Microsoft.Azure.Commands.Insights.OutputClasses
             this.Claims = new PSDictionaryElement(eventData.Claims);
             this.CorrelationId = eventData.CorrelationId;
             this.Description = eventData.Description;
-            this.EventChannels = eventData.Channels;
             this.EventDataId = eventData.EventDataId;
             this.EventName = eventData.EventName.Value;
             this.Category = eventData.Category.Value;

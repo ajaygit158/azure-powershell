@@ -106,7 +106,7 @@ namespace Microsoft.Azure.Commands.Insights.Autoscale
             AutoscaleSettingResource parameters = this.CreateAutoscaleSettingResource();
 
             // The result of this operation is operation (AutoscaleSettingResource) is being discarded for backwards compatibility
-            var result = this.InsightsManagementClient.AutoscaleSettings.CreateOrUpdateWithHttpMessagesAsync(resourceGroupName: this.ResourceGroup, autoscaleSettingName: this.Name, parameters: parameters).Result;
+            var result = this.MonitorManagementClient.AutoscaleSettings.CreateOrUpdateWithHttpMessagesAsync(resourceGroupName: this.ResourceGroup, autoscaleSettingName: this.Name, parameters: parameters).Result;
 
             // Keep this response for backwards compatibility.
             // Note: Create operations return the newly created object in the new specification, i.e. need to use result.Body

@@ -20,32 +20,32 @@ using System;
 namespace Microsoft.Azure.Commands.Insights
 {
     /// <summary>
-    /// Base class for the Azure Insights SDK Cmdlets based on the InsightsClient
+    /// Base class for the Azure Insights SDK Cmdlets based on the MonitorClient
     /// </summary>
-    public abstract class InsightsClientCmdletBase : InsightsCmdletBase, IDisposable
+    public abstract class MonitorClientCmdletBase : InsightsCmdletBase, IDisposable
     {
         #region General declarations
 
-        private IInsightsClient insightsClient;
+        private IMonitorClient monitorClient;
 
         private bool disposed;
 
         /// <summary>
-        /// Gets the InsightsClient to use in the Cmdlet
+        /// Gets the MonitorClient to use in the Cmdlet
         /// </summary>
-        public IInsightsClient InsightsClient
+        public IMonitorClient MonitorClient
         {
             get
             {
-                if (this.insightsClient == null)
+                if (this.monitorClient == null)
                 {
                     // The premise is that a command to establish a context (like Add-AzureRmAccount) has been called before this command in order to have a correct CurrentContext
-                    this.insightsClient = AzureSession.ClientFactory.CreateArmClient<InsightsClient>(DefaultProfile.Context, AzureEnvironment.Endpoint.ResourceManager);
+                    this.monitorClient = AzureSession.ClientFactory.CreateArmClient<MonitorClient>(DefaultProfile.Context, AzureEnvironment.Endpoint.ResourceManager);
                 }
 
-                return this.insightsClient;
+                return this.monitorClient;
             }
-            set { this.insightsClient = value; }
+            set { this.monitorClient = value; }
         }
 
         /// <summary>
@@ -56,10 +56,10 @@ namespace Microsoft.Azure.Commands.Insights
         {
             if (!this.disposed)
             {
-                if (this.insightsClient != null)
+                if (this.MonitorClient != null)
                 {
-                    this.insightsClient.Dispose();
-                    this.insightsClient = null;
+                    this.MonitorClient.Dispose();
+                    this.MonitorClient = null;
                 }
 
                 this.disposed = true;

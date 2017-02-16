@@ -81,7 +81,7 @@ namespace Microsoft.Azure.Commands.Insights.Alerts
             AlertRuleResource parameters = this.CreateSdkCallParameters();
 
             // Part of the result of this operation is operation (result.Body ==> a AutoscaleSettingResource) is being discarded for backwards compatibility
-            var result = this.InsightsManagementClient.AlertRules.CreateOrUpdateWithHttpMessagesAsync(resourceGroupName: this.ResourceGroup, parameters: parameters, ruleName: parameters.AlertRuleResourceName).Result;
+            var result = this.MonitorManagementClient.AlertRules.CreateOrUpdateWithHttpMessagesAsync(resourceGroupName: this.ResourceGroup, parameters: parameters, ruleName: parameters.AlertRuleResourceName).Result;
 
             // Keep this response for backwards compatibility.
             // Note: Create operations return the newly created object in the new specification, i.e. need to use result.Body

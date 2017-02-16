@@ -62,7 +62,7 @@ namespace Microsoft.Azure.Commands.Insights.Autoscale
             if (string.IsNullOrWhiteSpace(this.Name))
             {
                 // Retrieve all the Autoscale settings for a resource group
-                IPage<AutoscaleSettingResource> result = this.InsightsManagementClient.AutoscaleSettings.ListByResourceGroupAsync(resourceGroupName: this.ResourceGroup).Result;
+                IPage<AutoscaleSettingResource> result = this.MonitorManagementClient.AutoscaleSettings.ListByResourceGroupAsync(resourceGroupName: this.ResourceGroup).Result;
 
                 var records = result.Select(e => this.DetailedOutput.IsPresent ? new PSAutoscaleSetting(e) : e);
                 WriteObject(sendToPipeline: records, enumerateCollection: true);
@@ -70,7 +70,7 @@ namespace Microsoft.Azure.Commands.Insights.Autoscale
             else
             {
                 // Retrieve a single Autoscale setting determined by the resource group and the rule name
-                AutoscaleSettingResource result = this.InsightsManagementClient.AutoscaleSettings.GetAsync(resourceGroupName: this.ResourceGroup, autoscaleSettingName: this.Name).Result;
+                AutoscaleSettingResource result = this.MonitorManagementClient.AutoscaleSettings.GetAsync(resourceGroupName: this.ResourceGroup, autoscaleSettingName: this.Name).Result;
 
                 WriteObject(sendToPipeline: this.DetailedOutput.IsPresent ? new PSAutoscaleSetting(result) : result);
             }

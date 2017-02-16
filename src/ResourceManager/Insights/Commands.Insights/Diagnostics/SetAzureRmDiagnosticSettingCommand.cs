@@ -131,7 +131,7 @@ namespace Microsoft.Azure.Commands.Insights.Diagnostics
                 throw new ArgumentException("No operation is specified");
             }
 
-            ServiceDiagnosticSettingsResource getResponse = this.InsightsManagementClient.ServiceDiagnosticSettings.GetAsync(resourceUri: this.ResourceId, cancellationToken: CancellationToken.None).Result;
+            ServiceDiagnosticSettingsResource getResponse = this.MonitorManagementClient.ServiceDiagnosticSettings.GetAsync(resourceUri: this.ResourceId, cancellationToken: CancellationToken.None).Result;
 
             ServiceDiagnosticSettingsResource properties = getResponse;
 
@@ -165,7 +165,7 @@ namespace Microsoft.Azure.Commands.Insights.Diagnostics
 
             var putParameters = CopySettings(properties);
 
-            ServiceDiagnosticSettingsResource result = this.InsightsManagementClient.ServiceDiagnosticSettings.CreateOrUpdateAsync(resourceUri: this.ResourceId, parameters: putParameters, cancellationToken: CancellationToken.None).Result;
+            ServiceDiagnosticSettingsResource result = this.MonitorManagementClient.ServiceDiagnosticSettings.CreateOrUpdateAsync(resourceUri: this.ResourceId, parameters: putParameters, cancellationToken: CancellationToken.None).Result;
             WriteObject(result);
         }
 

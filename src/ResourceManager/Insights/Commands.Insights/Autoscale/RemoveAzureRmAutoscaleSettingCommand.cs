@@ -50,7 +50,7 @@ namespace Microsoft.Azure.Commands.Insights.Autoscale
         protected override void ProcessRecordInternal()
         {
             WriteWarning("The output of this cmdlet will change. The cmdlet will not return anything in future releases.");
-            var result = this.InsightsManagementClient.AutoscaleSettings.DeleteWithHttpMessagesAsync(resourceGroupName: this.ResourceGroup, autoscaleSettingName: this.Name).Result;
+            var result = this.MonitorManagementClient.AutoscaleSettings.DeleteWithHttpMessagesAsync(resourceGroupName: this.ResourceGroup, autoscaleSettingName: this.Name).Result;
 
             // Keep this response for backwards compatibility.
             // Note: Delete operations return nothing in the new specification.

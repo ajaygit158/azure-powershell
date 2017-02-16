@@ -31,7 +31,7 @@ namespace Microsoft.Azure.Commands.Insights.Test.Alerts
     public class AddAzureRmLogAlertRuleTests
     {
         private readonly AddAzureRmLogAlertRuleCommand cmdlet;
-        private readonly Mock<InsightsManagementClient> insightsManagementClientMock;
+        private readonly Mock<MonitorManagementClient> insightsManagementClientMock;
         private readonly Mock<IAlertRulesOperations> insightsAlertRuleOperationsMock;
         private Mock<ICommandRuntime> commandRuntimeMock;
         private Rest.Azure.AzureOperationResponse<AlertRuleResource> response;
@@ -42,12 +42,12 @@ namespace Microsoft.Azure.Commands.Insights.Test.Alerts
         {
             // XunitTracingInterceptor.AddToContext(new XunitTracingInterceptor(output));
             insightsAlertRuleOperationsMock = new Mock<IAlertRulesOperations>();
-            insightsManagementClientMock = new Mock<InsightsManagementClient>();
+            insightsManagementClientMock = new Mock<MonitorManagementClient>();
             commandRuntimeMock = new Mock<ICommandRuntime>();
             cmdlet = new AddAzureRmLogAlertRuleCommand()
             {
                 CommandRuntime = commandRuntimeMock.Object,
-                InsightsManagementClient = insightsManagementClientMock.Object
+                MonitorManagementClient = insightsManagementClientMock.Object
             };
 
             AlertRuleResource alertRuleResourceInput = new AlertRuleResource(location: null, isEnabled: true, alertRuleResourceName: "a name");
