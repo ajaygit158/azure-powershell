@@ -51,7 +51,7 @@ namespace Microsoft.Azure.Commands.Insights.Test.Diagnostics
                 CommandRuntime = commandRuntimeMock.Object,
                 MonitorManagementClient = insightsManagementClientMock.Object
             };
-
+            
             this.ExistingSetting = GetDefaultSetting();
 
             insightsDiagnosticsOperationsMock.Setup(f => f.GetWithHttpMessagesAsync(
@@ -86,7 +86,7 @@ namespace Microsoft.Azure.Commands.Insights.Test.Diagnostics
         [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void DisableStorage()
         {
-            cmdlet.DisableStorage = new SwitchParameter(true);
+            cmdlet.MyInvocation.BoundParameters["StorageAccountId"] = null;
             cmdlet.ExecuteCmdlet();
 
             ServiceDiagnosticSettingsResource expectedSettings = GetDefaultSetting();
@@ -102,6 +102,7 @@ namespace Microsoft.Azure.Commands.Insights.Test.Diagnostics
         {
             string newStorageId = "otherstorage";
             cmdlet.StorageAccountId = newStorageId;
+            cmdlet.MyInvocation.BoundParameters[SetAzureRmDiagnosticSettingCommand.StorageAccountIdParamName] = newStorageId;
             cmdlet.ExecuteCmdlet();
 
             ServiceDiagnosticSettingsResource expectedSettings = GetDefaultSetting();
@@ -117,6 +118,7 @@ namespace Microsoft.Azure.Commands.Insights.Test.Diagnostics
         {
             string newServiceBusId = "otherservicebus";
             cmdlet.ServiceBusRuleId = newServiceBusId;
+            cmdlet.MyInvocation.BoundParameters[SetAzureRmDiagnosticSettingCommand.ServiceBusRuleIdParamName] = newServiceBusId;
             cmdlet.ExecuteCmdlet();
 
             ServiceDiagnosticSettingsResource expectedSettings = GetDefaultSetting();
@@ -132,6 +134,7 @@ namespace Microsoft.Azure.Commands.Insights.Test.Diagnostics
         {
             string newWorkspaceId = "otherworkspace";
             cmdlet.WorkspaceId = newWorkspaceId;
+            cmdlet.MyInvocation.BoundParameters[SetAzureRmDiagnosticSettingCommand.WorkspacetIdParamName] = newWorkspaceId;
             cmdlet.ExecuteCmdlet();
 
             ServiceDiagnosticSettingsResource expectedSettings = GetDefaultSetting();
@@ -147,6 +150,7 @@ namespace Microsoft.Azure.Commands.Insights.Test.Diagnostics
         {
             cmdlet.Categories = new List<string> { "TestCategory1"};
             cmdlet.Enabled = false;
+            cmdlet.MyInvocation.BoundParameters[SetAzureRmDiagnosticSettingCommand.EnabledParamName] = false;
             cmdlet.ExecuteCmdlet();
 
             ServiceDiagnosticSettingsResource expectedSettings = GetDefaultSetting();
@@ -162,6 +166,7 @@ namespace Microsoft.Azure.Commands.Insights.Test.Diagnostics
         {
             cmdlet.Timegrains = new List<string> { "PT1H" };
             cmdlet.Enabled = false;
+            cmdlet.MyInvocation.BoundParameters[SetAzureRmDiagnosticSettingCommand.EnabledParamName] = false;
             cmdlet.ExecuteCmdlet();
 
             ServiceDiagnosticSettingsResource expectedSettings = GetDefaultSetting();
@@ -175,7 +180,7 @@ namespace Microsoft.Azure.Commands.Insights.Test.Diagnostics
         [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void DisableEventHub()
         {
-            cmdlet.DisableServiceBus = new SwitchParameter(true);
+            cmdlet.MyInvocation.BoundParameters[SetAzureRmDiagnosticSettingCommand.ServiceBusRuleIdParamName] = null;
             cmdlet.ExecuteCmdlet();
 
             ServiceDiagnosticSettingsResource expectedSettings = GetDefaultSetting();
@@ -189,7 +194,7 @@ namespace Microsoft.Azure.Commands.Insights.Test.Diagnostics
         [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void DisableWorkspace()
         {
-            cmdlet.DisableWorkspace = new SwitchParameter(true);
+            cmdlet.MyInvocation.BoundParameters["WorkspaceId"] = null;
             cmdlet.ExecuteCmdlet();
 
             ServiceDiagnosticSettingsResource expectedSettings = GetDefaultSetting();

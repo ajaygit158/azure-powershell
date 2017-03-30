@@ -22,6 +22,7 @@ using System.Xml;
 using Microsoft.Azure.Commands.Insights.OutputClasses;
 using Microsoft.Azure.Management.Insights;
 using Microsoft.Azure.Management.Insights.Models;
+using Newtonsoft.Json;
 
 namespace Microsoft.Azure.Commands.Insights.Diagnostics
 {
@@ -31,6 +32,11 @@ namespace Microsoft.Azure.Commands.Insights.Diagnostics
     [Cmdlet(VerbsCommon.Set, "AzureRmDiagnosticSetting"), OutputType(typeof(PSServiceDiagnosticSettings))]
     public class SetAzureRmDiagnosticSettingCommand : ManagementCmdletBase
     {
+        public const string StorageAccountIdParamName = "StorageAccountId";
+        public const string ServiceBusRuleIdParamName = "ServiceBusRuleId";
+        public const string WorkspacetIdParamName = "WorkspaceId";
+        public const string EnabledParamName = "Enabled";
+
         #region Parameters declarations
 
         /// <summary>
@@ -41,38 +47,15 @@ namespace Microsoft.Azure.Commands.Insights.Diagnostics
         public string ResourceId { get; set; }
 
         /// <summary>
-        /// Gets or sets the switch for storage parameter of the cmdlet
-        /// </summary>
-        [Parameter(Mandatory = false, HelpMessage = "Disable storage")]
-        [ValidateNotNullOrEmpty]
-        public SwitchParameter DisableStorage { get; set; }
-
-        /// <summary>
-        /// Gets or sets the switch for eventhub parameter of the cmdlet
-        /// </summary>
-        [Parameter(Mandatory = false, HelpMessage = "Disable service bus")]
-        [ValidateNotNullOrEmpty]
-        public SwitchParameter DisableServiceBus { get; set; }
-
-        /// <summary>
-        /// Gets or sets the switch for workspace parameter of the cmdlet
-        /// </summary>
-        [Parameter(Mandatory = false, HelpMessage = "Disable workspace")]
-        [ValidateNotNullOrEmpty]
-        public SwitchParameter DisableWorkspace { get; set; }
-
-        /// <summary>
         /// Gets or sets the storage account parameter of the cmdlet
         /// </summary>
         [Parameter(Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "The storage account id")]
-        [ValidateNotNullOrEmpty]
         public string StorageAccountId { get; set; }
 
         /// <summary>
         /// Gets or sets the service bus rule id parameter of the cmdlet
         /// </summary>
         [Parameter(Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "The service bus rule id")]
-        [ValidateNotNullOrEmpty]
         public string ServiceBusRuleId { get; set; }
 
         /// <summary>
@@ -80,7 +63,7 @@ namespace Microsoft.Azure.Commands.Insights.Diagnostics
         /// </summary>
         [Parameter(Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "The value indicating whether the diagnostics should be enabled or disabled")]
         [ValidateNotNullOrEmpty]
-        public bool? Enabled { get; set; }
+        public bool Enabled { get; set; }
 
         /// <summary>
         /// Gets or sets the categories parameter of the cmdlet
@@ -107,7 +90,6 @@ namespace Microsoft.Azure.Commands.Insights.Diagnostics
         /// Gets or sets the OMS workspace Id
         /// </summary>
         [Parameter(Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "The resource Id of the Log Analytics workspace to send logs/metrics to")]
-        [ValidateNotNullOrEmpty]
         public string WorkspaceId { get; set; }
 
         /// <summary>
@@ -118,15 +100,27 @@ namespace Microsoft.Azure.Commands.Insights.Diagnostics
 
         #endregion
 
+        private bool isStorageParamPresent;
+
+        private bool isServiceBusParamPresent;
+
+        private bool isWorkspaceParamPresent;
+
+        private bool isEnbledParameterPresent;
+
         protected override void ProcessRecordInternal()
         {
-            if (!DisableStorage &&
-                !DisableServiceBus &&
-                !DisableWorkspace &&
-                string.IsNullOrWhiteSpace(this.StorageAccountId) &&
-                string.IsNullOrWhiteSpace(this.ServiceBusRuleId) &&
-                string.IsNullOrWhiteSpace(this.WorkspaceId) &&
-                !this.Enabled.HasValue)
+            HashSet<string> usedParams = new HashSet<string>(this.MyInvocation.BoundParameters.Keys, StringComparer.OrdinalIgnoreCase);
+
+            this.isStorageParamPresent = usedParams.Contains(StorageAccountIdParamName);
+            this.isServiceBusParamPresent = usedParams.Contains(ServiceBusRuleIdParamName);
+            this.isWorkspaceParamPresent = usedParams.Contains(WorkspacetIdParamName);
+            this.isEnbledParameterPresent = usedParams.Contains(EnabledParamName);
+
+            if (!this.isStorageParamPresent &&
+                !this.isServiceBusParamPresent &&
+                !this.isWorkspaceParamPresent &&
+                !this.isEnbledParameterPresent)
             {
                 throw new ArgumentException("No operation is specified");
             }
@@ -207,7 +201,7 @@ namespace Microsoft.Azure.Commands.Insights.Diagnostics
 
         private void SetSelectedTimegrains(ServiceDiagnosticSettingsResource properties)
         {
-            if (!this.Enabled.HasValue)
+            if (!this.isEnbledParameterPresent)
             {
                 throw new ArgumentException("Parameter 'Enabled' is required by 'Timegrains' parameter.");
             }
@@ -221,13 +215,13 @@ namespace Microsoft.Azure.Commands.Insights.Diagnostics
                 {
                     throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "Metric timegrain '{0}' is not available", timegrainString));
                 }
-                metricSettings.Enabled = this.Enabled.Value;
+                metricSettings.Enabled = this.Enabled;
             }
         }
 
         private void SetSelectedCategories(ServiceDiagnosticSettingsResource properties)
         {
-            if (!this.Enabled.HasValue)
+            if (!this.isEnbledParameterPresent)
             {
                 throw new ArgumentException("Parameter 'Enabled' is required by 'Categories' parameter.");
             }
@@ -241,76 +235,49 @@ namespace Microsoft.Azure.Commands.Insights.Diagnostics
                     throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "Log category '{0}' is not available", category));
                 }
 
-                logSettings.Enabled = this.Enabled.Value;
+                logSettings.Enabled = this.Enabled;
             }
         }
 
         private void SetAllCategoriesAndTimegrains(ServiceDiagnosticSettingsResource properties)
         {
-            if (!this.Enabled.HasValue)
+            if (!this.isEnbledParameterPresent)
             {
                 return;
             }
 
             foreach (var log in properties.Logs)
             {
-                log.Enabled = this.Enabled.Value;
+                log.Enabled = this.Enabled;
             }
 
             foreach (var metric in properties.Metrics)
             {
-                metric.Enabled = this.Enabled.Value;
+                metric.Enabled = this.Enabled;
             }
         }
 
         private void SetWorkspace(ServiceDiagnosticSettingsResource properties)
         {
-            if (!string.IsNullOrWhiteSpace(this.WorkspaceId))
+            if (this.isWorkspaceParamPresent)
             {
-                if (this.DisableWorkspace)
-                {
-                    throw new ArgumentException("WorkspaceId and DisableWorkspace cannot be both present.");
-                }
-
                 properties.WorkspaceId = this.WorkspaceId;
-            }
-            else if (this.DisableWorkspace)
-            {
-                properties.WorkspaceId = null;
             }
         }
 
         private void SetServiceBus(ServiceDiagnosticSettingsResource properties)
         {
-            if (!string.IsNullOrWhiteSpace(this.ServiceBusRuleId))
+            if (this.isServiceBusParamPresent)
             {
-                if (this.DisableServiceBus)
-                {
-                    throw new ArgumentException("ServiceBusId and DisableServiceBus cannot be both present.");
-                }
-
                 properties.ServiceBusRuleId = this.ServiceBusRuleId;
-            }
-            else if (this.DisableServiceBus)
-            {
-                properties.ServiceBusRuleId = null;
             }
         }
 
         private void SetStorage(ServiceDiagnosticSettingsResource properties)
         {
-            if (!string.IsNullOrWhiteSpace(this.StorageAccountId))
+            if (this.isStorageParamPresent)
             {
-                if (this.DisableStorage)
-                {
-                    throw new ArgumentException("StorageAccountId and DisableStorage cannot be both present.");
-                }
-
                 properties.StorageAccountId = this.StorageAccountId;
-            }
-            else if (this.DisableStorage)
-            {
-                properties.StorageAccountId = null;
             }
         }
     }
