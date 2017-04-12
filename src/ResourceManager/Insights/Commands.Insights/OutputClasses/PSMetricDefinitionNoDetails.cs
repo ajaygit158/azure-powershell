@@ -20,18 +20,8 @@ namespace Microsoft.Azure.Commands.Insights.OutputClasses
     /// <summary>
     /// Wraps around MetricDefinition to provide summarized data about it
     /// </summary>
-    public class PSMetricDefinitionNoDetails : MetricDefinition
+    public class PSMetricDefinitionNoDetails : PSMetricDefinition
     {
-        /// <summary>
-        /// Gets or sets the Name of the metric
-        /// </summary>
-        public new string Name { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the metric definition Id
-        /// </summary>
-        protected internal new string Id { get; private set; }
- 
         /// <summary>
         /// Gets or sets the list of MetricAvailability objects
         /// </summary>
@@ -42,10 +32,9 @@ namespace Microsoft.Azure.Commands.Insights.OutputClasses
         /// </summary>
         /// <param name="metricDefinition">The MetricDefinition</param>
         public PSMetricDefinitionNoDetails(MetricDefinition metricDefinition)
-            : base(name: metricDefinition.Name, primaryAggregationType: metricDefinition.PrimaryAggregationType, resourceId: metricDefinition.ResourceId, unit: metricDefinition.Unit, metricAvailabilities: metricDefinition.MetricAvailabilities, id: metricDefinition.Id)
+            : base(metricDefinition)
         {
-            this.Name = metricDefinition.Name != null ? metricDefinition.Name.Value : null;
-            this.Id = metricDefinition.Id;
+            this.Name = new PSLocalizableStringNoDetails(metricDefinition.Name);
             this.MetricAvailabilities = metricDefinition.MetricAvailabilities;
         }
     }

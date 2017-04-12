@@ -22,19 +22,12 @@ namespace Microsoft.Azure.Commands.Insights.OutputClasses
     public class PSMetricDefinition : MetricDefinition
     {
         /// <summary>
-        /// Gets or sets the Name of the metric
-        /// </summary>
-        public new PSLocalizableString Name { get; set; }
-
-        /// <summary>
         /// Initializes an new instance of the PSMetricDefinition class
         /// </summary>
         /// <param name="metricDefinition">The MetricDefinition</param>
         public PSMetricDefinition(MetricDefinition metricDefinition)
-            : base(name: metricDefinition.Name, metricAvailabilities: metricDefinition.MetricAvailabilities, primaryAggregationType: metricDefinition.PrimaryAggregationType, resourceId: metricDefinition.ResourceId, unit: metricDefinition.Unit, id: metricDefinition.Id)
+            : base(name: new PSLocalizableString(metricDefinition.Name), metricAvailabilities: new PSMetricAvailabilityCollection(metricDefinition.MetricAvailabilities), primaryAggregationType: metricDefinition.PrimaryAggregationType, resourceId: metricDefinition.ResourceId, unit: metricDefinition.Unit, id: metricDefinition.Id)
         {
-            this.MetricAvailabilities = new PSAvailabilityCollection(metricDefinition.MetricAvailabilities);
-            this.Name = new PSLocalizableString(metricDefinition.Name);
         }
     }
 }

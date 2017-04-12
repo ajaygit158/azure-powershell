@@ -12,7 +12,6 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using Microsoft.Azure.Commands.Common.Authentication;
 using Microsoft.Azure.Commands.Insights.OutputClasses;
 using System.Linq;
 using System.Management.Automation;
@@ -27,7 +26,7 @@ namespace Microsoft.Azure.Commands.Insights.Metrics
     /// <summary>
     /// Get the list of metric definitions for a resource.
     /// </summary>
-    [Cmdlet(VerbsCommon.Get, "AzureRmMetricDefinition"), OutputType(typeof(MetricDefinition[]))]
+    [Cmdlet(VerbsCommon.Get, "AzureRmMetricDefinition"), OutputType(typeof(PSMetricDefinition[]))]
     public class GetAzureRmMetricDefinitionCommand : MonitorClientCmdletBase
     {
         /// <summary>
@@ -81,7 +80,7 @@ namespace Microsoft.Azure.Commands.Insights.Metrics
             var response = this.MonitorClient.MetricDefinitions.ListAsync(resourceUri: this.ResourceId, odataQuery: new ODataQuery<MetricDefinition>(queryFilter), cancellationToken: CancellationToken.None).Result;
 
             // If fullDetails is present full details of the records are displayed, otherwise only a summary of the records is displayed
-            var records = response.Select<MetricDefinition, MetricDefinition>(e => fullDetails ? (MetricDefinition)new PSMetricDefinition(e) : new PSMetricDefinitionNoDetails(e)).ToArray();
+            var records = response.Select(e => fullDetails ? new PSMetricDefinition(e) : new PSMetricDefinitionNoDetails(e)).ToArray();
 
             WriteObject(sendToPipeline: records, enumerateCollection: true);
         }

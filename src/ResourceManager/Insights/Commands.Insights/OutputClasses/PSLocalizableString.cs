@@ -33,14 +33,5 @@ namespace Microsoft.Azure.Commands.Insights.OutputClasses
                 this.Value = localizableString.Value;
             }
         }
-
-        /// <summary>
-        /// A string representation of the list LocalizableString objects including indentation
-        /// </summary>
-        /// <returns>A string representation of the LocalizableString object including indentation</returns>
-        public override string ToString()
-        {
-            return this.ToString(indentationTabs: 1);
-        }
     }
 }

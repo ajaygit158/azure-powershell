@@ -12,38 +12,33 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using System.Text;
-using Microsoft.Azure.Management.Insights.Models;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Azure.Insights.Models;
 
 namespace Microsoft.Azure.Commands.Insights.OutputClasses
 {
     /// <summary>
-    /// Wrapps around the LogSettings
+    /// Wraps around a list of MetricAvailability objects to display them with indentation
     /// </summary>
-    public class PSLogSettings : LogSettings
+    public class PSMetricAvailabilityCollection : List<MetricAvailability>
     {
         /// <summary>
-        /// Initializes a new instance of the PSLogSettings class.
+        /// Initializes a new instance of the PSAvailabilityCollection class
         /// </summary>
-        public PSLogSettings(LogSettings logSettings)
+        /// <param name="metricAvailabilities">The list of metric availabilities</param>
+        public PSMetricAvailabilityCollection(IEnumerable<MetricAvailability> metricAvailabilities)
         {
-            this.Enabled = logSettings.Enabled;
-            this.Category = logSettings.Category;
-            this.RetentionPolicy = logSettings.RetentionPolicy;
+            this.AddRange(metricAvailabilities.Select(e => new PSMetricAvailability(e)));
         }
 
-        /// <summary>
-        /// A string representation of the PSLogSettings
+/*        /// <summary>
+        /// A string representation of the list MetricAvailability objects including indentation
         /// </summary>
-        /// <returns>A string representation of the PSLogSettings</returns>
+        /// <returns>A string representation of the list of MetricAvailability objects including indentation</returns>
         public override string ToString()
         {
-            var output = new StringBuilder();
-            output.AppendLine();
-            output.AppendLine("Enabled         : " + Enabled);
-            output.AppendLine("Category        : " + Category);
-            output.Append("RetentionPolicy : " + RetentionPolicy.ToString(1));
-            return output.ToString();
-        }
+            return this.ToString(); //indentationTabs: 1);
+        } */
     }
 }

@@ -19,31 +19,15 @@ namespace Microsoft.Azure.Commands.Insights.OutputClasses
     /// <summary>
     /// Wrapps around the PSMetricNoDetails and exposes all the localized strings as invariant/localized properties
     /// </summary>
-    public sealed class PSMetric : Metric
+    public class PSMetric : Metric
     {
-        /// <summary>
-        /// Gets or sets the MetricValues collection of the metric
-        /// </summary>
-        public new PSMetricValuesCollection Data { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Properties of the metric
-        /// Gets or sets the Name of the metric
-        /// </summary>
-        public new PSLocalizableString Name { get; set; }
-
         /// <summary>
         /// Initializes a new instance of the PSMetric class.
         /// </summary>
         /// <param name="metric">The input Metric object</param>
         public PSMetric(Metric metric)
+            : base(name: new PSLocalizableString(metric.Name), unit: metric.Unit, data: new PSMetricValuesCollection(metric.Data), id: metric.Id, type: metric.Type)
         {
-            base.Data = metric.Data;
-            base.Name = metric.Name;
-            
-            this.Data = new PSMetricValuesCollection(metric.Data);
-            this.Name = new PSLocalizableString(metric.Name);
-            this.Unit = metric.Unit;
         }
     }
 }

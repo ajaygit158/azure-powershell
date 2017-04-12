@@ -168,12 +168,12 @@ namespace Microsoft.Azure.Commands.Insights.Test.Autoscale
                 profiles = new List<AutoscaleProfile>() { this.CreateAutoscaleProfile() };
             }
 
-            var setting = new AutoscaleSettingResource
+            var setting = new AutoscaleSettingResource(
+                location: location,
+                profiles: profiles,
+                name: name)
             {
-                Location = location,
-                Name = name,
                 Enabled = true,
-                Profiles = profiles,
                 TargetResourceUri = Utilities.ResourceUri,
                 Tags = new Dictionary<string, string>()
             };

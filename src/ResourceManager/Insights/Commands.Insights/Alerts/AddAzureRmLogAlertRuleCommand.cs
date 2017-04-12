@@ -12,8 +12,8 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
+using Microsoft.Azure.Commands.Insights.OutputClasses;
 using Microsoft.Azure.Management.Insights.Models;
-using System;
 using System.Collections.Generic;
 using System.Management.Automation;
 
@@ -22,7 +22,7 @@ namespace Microsoft.Azure.Commands.Insights.Alerts
     /// <summary>
     /// Add an Alert rule
     /// </summary>
-    [Cmdlet(VerbsCommon.Add, "AzureRmLogAlertRule"), OutputType(typeof(List<PSObject>))]
+    [Cmdlet(VerbsCommon.Add, "AzureRmLogAlertRule"), OutputType(typeof(PSAddAlertRuleOperationResponse))]
     public class AddAzureRmLogAlertRuleCommand : AddAzureRmAlertRuleCommandBase
     {
         /// <summary>
@@ -89,17 +89,19 @@ namespace Microsoft.Azure.Commands.Insights.Alerts
 
         protected override AlertRuleResource CreateSdkCallParameters()
         {
+            WriteWarning("Add-AzureRMLogAlertRule API will be deprecated in future releases.");
+
             RuleCondition condition = this.CreateRuleCondition();
 
             WriteVerboseWithTimestamp(string.Format("CreateSdkCallParameters: Creating rule object"));
-            var rule = new AlertRuleResource(
-                location: this.Location,
-                isEnabled: !this.DisableRule,
-                alertRuleResourceName: this.Name)
+            var rule = new AlertRuleResource()
             {
                 Description = this.Description ?? Utilities.GetDefaultDescription("log alert rule"),
                 Condition = condition,
                 Actions = this.Actions,
+                Location = this.Location,
+                IsEnabled = !this.DisableRule,
+                AlertRuleResourceName = this.Name,
 
                 // DO NOT REMOVE OR CHANGE the following. The two elements in the Tags are required by other services.
                 Tags = new Dictionary<string, string>(),

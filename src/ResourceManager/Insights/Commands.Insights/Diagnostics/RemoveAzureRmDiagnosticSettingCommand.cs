@@ -15,45 +15,47 @@
 using System.Net;
 using Microsoft.Azure.Commands.Insights.OutputClasses;
 using System.Management.Automation;
+using System.Threading;
 
-namespace Microsoft.Azure.Commands.Insights.Alerts
+namespace Microsoft.Azure.Commands.Insights.Diagnostics
 {
     /// <summary>
-    /// Remove an Alert rule
+    /// Deletes the Diagnostic Settings of a resource.
     /// </summary>
-    [Cmdlet(VerbsCommon.Remove, "AzureRmAlertRule"), OutputType(typeof(PSAddAlertRuleOperationResponse))]
-    public class RemoveAzureRmAlertRuleCommand : ManagementCmdletBase
+    [Cmdlet(VerbsCommon.Remove, "AzureRmDiagnosticSetting"), OutputType(typeof(PSDiagnosticSettingOperationResponse))]
+    public class RemoveAzureRmDiagnosticSettingCommand : ManagementCmdletBase
     {
-        internal const string RemoveAzureRmAlertRuleParamGroup = "Parameters for Remove-AzureRmAlertRule cmdlet";
 
-        #region Parameter declaration
+        #region Parameters declarations
 
         /// <summary>
-        /// Gets or sets the ResourceGroupName parameter of the cmdlet
+        /// Gets or sets the resourceId parameter of the cmdlet
         /// </summary>
-        [Parameter(ParameterSetName = RemoveAzureRmAlertRuleParamGroup, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "The resource group name")]
+        [Parameter(Position = 0, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "The ResourceId")]
         [ValidateNotNullOrEmpty]
-        public string ResourceGroup { get; set; }
+        public string ResourceId { get; set; }
 
         /// <summary>
-        /// Gets or sets the rule name parameter of the cmdlet
+        /// Gets or sets the name of the service
         /// </summary>
-        [Parameter(ParameterSetName = RemoveAzureRmAlertRuleParamGroup, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "The alert rule name")]
+        [Parameter(Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "The name of the service. Defaults to 'service'")]
         [ValidateNotNullOrEmpty]
         public string Name { get; set; }
 
         #endregion
 
-        /// <summary>
-        /// Execute the cmdlet
-        /// </summary>
         protected override void ProcessRecordInternal()
         {
             WriteWarning("The output of this cmdlet will change. Remove operations will not return anything in future releases.");
-            var result = this.MonitorManagementClient.AlertRules.DeleteWithHttpMessagesAsync(resourceGroupName: this.ResourceGroup, ruleName: this.Name).Result;
+            if (string.IsNullOrWhiteSpace(this.Name))
+            {
+                this.Name = "service";
+            }
+
+            Rest.Azure.AzureOperationResponse result = this.MonitorManagementClient.DiagnosticSettings.DeleteWithHttpMessagesAsync(resourceUri: this.ResourceId, name: this.Name, cancellationToken: CancellationToken.None).Result;
 
             // Note: Delete operations return nothing in the new specification.
-            var response = new PSAddAlertRuleOperationResponse()
+            var response = new PSDiagnosticSettingOperationResponse
             {
                 RequestId = result.RequestId,
                 StatusCode = result.Response != null ? result.Response.StatusCode : HttpStatusCode.OK

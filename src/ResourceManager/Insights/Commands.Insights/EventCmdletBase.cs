@@ -214,7 +214,7 @@ namespace Microsoft.Azure.Commands.Insights
             // If fullDetails is present do not select fields, if not present fetch only the SelectedFieldsForQuery
             var query = new ODataQuery<EventData>(queryFilter);
             IPage<EventData> response = this.MonitorClient.ActivityLogs.ListAsync(odataQuery: query, select: fullDetails ? null : PSEventDataNoDetails.SelectedFieldsForQuery, cancellationToken: CancellationToken.None).Result;
-            var records = new List<IPSEventData>();
+            var records = new List<PSEventData>();
             var enumerator = response.GetEnumerator();
             enumerator.ExtractCollectionFromResult(fullDetails: fullDetails, records: records, keepTheRecord: this.KeepTheRecord);
             string nextLink = response.NextPageLink;
@@ -227,7 +227,7 @@ namespace Microsoft.Azure.Commands.Insights
                 nextLink = response.NextPageLink;
             }
 
-            var recordsReturned = new List<IPSEventData>();
+            var recordsReturned = new List<PSEventData>();
             if (records.Count > maxNumberOfRecords)
             {
                 recordsReturned.AddRange(records.Take(maxNumberOfRecords));

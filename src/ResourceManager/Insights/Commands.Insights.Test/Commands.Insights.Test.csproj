@@ -62,7 +62,7 @@
       <HintPath>..\..\..\packages\Microsoft.Azure.Common.2.1.0\lib\net45\Microsoft.Azure.Common.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Azure.Monitor">
-      <HintPath>..\..\..\packages\Microsoft.Azure.Monitor.0.15.0-preview\lib\net45\Microsoft.Azure.Monitor.dll</HintPath>
+      <HintPath>..\..\..\packages\Microsoft.Azure.Monitor.0.16.0-preview\lib\net45\Microsoft.Azure.Monitor.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Azure.Test.Framework">
       <SpecificVersion>False</SpecificVersion>
@@ -138,6 +138,7 @@
     <Compile Include="Autoscale\NewAzureRmAutoscaleRuleTests.cs" />
     <Compile Include="Autoscale\NewAzureRmAutoscaleWebhookTests.cs" />
     <Compile Include="Autoscale\RemoveAzureRmAutoscaleSettingTests.cs" />
+    <Compile Include="Diagnostics\RemoveDiagnosticSettingCommandTests.cs" />
     <Compile Include="Diagnostics\SetDiagnosticSettingCommandTests.cs" />
     <Compile Include="Diagnostics\GetDiagnosticSettingCommandTests.cs" />
     <Compile Include="Events\GetAzureRmLogTests.cs" />

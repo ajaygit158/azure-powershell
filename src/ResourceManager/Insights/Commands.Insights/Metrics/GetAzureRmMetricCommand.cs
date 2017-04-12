@@ -12,7 +12,6 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using Microsoft.Azure.Commands.Common.Authentication;
 using Microsoft.Azure.Commands.Insights.OutputClasses;
 using System;
 using System.Linq;
@@ -29,7 +28,7 @@ namespace Microsoft.Azure.Commands.Insights.Metrics
     /// <summary>
     /// Get the list of metric definition for a resource.
     /// </summary>
-    [Cmdlet(VerbsCommon.Get, "AzureRmMetric"), OutputType(typeof(Metric[]))]
+    [Cmdlet(VerbsCommon.Get, "AzureRmMetric"), OutputType(typeof(PSMetric[]))]
     public class GetAzureRmMetricCommand : MonitorClientCmdletBase
     {
         internal const string GetAzureRmAMetricParamGroup = "Parameters for Get-AzureRmMetric cmdlet in the default mode";
@@ -156,7 +155,7 @@ namespace Microsoft.Azure.Commands.Insights.Metrics
 
             // Call the proper API methods to return a list of raw records.
             var response = this.MonitorClient.Metrics.ListAsync(resourceUri: this.ResourceId, odataQuery: new ODataQuery<Metric>(queryFilter), cancellationToken: CancellationToken.None).Result;
-            var records = response.Select<Metric, Metric>(e => fullDetails ? (Metric)new PSMetric(e) : new PSMetricNoDetails(e)).ToArray();
+            var records = response.Select(e => fullDetails ? new PSMetric(e) : new PSMetricNoDetails(e)).ToArray();
 
             WriteObject(sendToPipeline: records, enumerateCollection: true);
         }

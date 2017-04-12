@@ -12,8 +12,10 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
+using System.Management.Automation;
 using Microsoft.Azure.Commands.ResourceManager.Common;
 using System;
+using Microsoft.Rest.Azure;
 
 namespace Microsoft.Azure.Commands.Insights
 {
@@ -38,6 +40,13 @@ namespace Microsoft.Azure.Commands.Insights
             }
             catch (AggregateException ex)
             {
+                var exTemp = ex.Flatten().InnerException;
+                var cloudException = exTemp as CloudException;
+                if (cloudException != null)
+                {
+                    throw new PSInvalidOperationException(cloudException.Message, cloudException);
+                }
+
                 throw ex.Flatten().InnerException;
             }
         }

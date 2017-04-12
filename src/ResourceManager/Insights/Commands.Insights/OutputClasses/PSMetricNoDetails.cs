@@ -12,7 +12,6 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using System.Collections.Generic;
 using Microsoft.Azure.Insights.Models;
 
 namespace Microsoft.Azure.Commands.Insights.OutputClasses
@@ -20,32 +19,16 @@ namespace Microsoft.Azure.Commands.Insights.OutputClasses
     /// <summary>
     /// Wrapps around the Metric and exposes a summary of the properties properties
     /// </summary>
-    public class PSMetricNoDetails : Metric
+    public class PSMetricNoDetails : PSMetric
     {
-        /// <summary>
-        /// Gets or sets the Name of the metric
-        /// </summary>
-        public new string Name { get; set; }
-
-        protected internal new IList<MetricValue> Data
-        {
-            get { return base.Data; }
-            set { base.Data = value; }
-        }
-
         /// <summary>
         /// Initializes a new instance of the PSMetric class.
         /// </summary>
         /// <param name="metric">The input Metric object</param>
         public PSMetricNoDetails(Metric metric)
+            : base(metric)
         {
-            // Keep the original value (localized string, Dictionary, List) in the base
-            base.Name = metric.Name;
-            base.Data = metric.Data;
-
-            this.Data = metric.Data;
-            this.Name = metric.Name == null ? null : metric.Name.Value;
-            this.Unit = metric.Unit;
+            this.Name = new PSLocalizableStringNoDetails(metric.Name);
         }
     }
 }

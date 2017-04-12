@@ -17,25 +17,28 @@ using Microsoft.Azure.Management.Insights.Models;
 namespace Microsoft.Azure.Commands.Insights.OutputClasses
 {
     /// <summary>
-    /// Wrapps around the ServiceDiagnosticSettings
+    /// Wrapps around the AlertRuleResource
     /// </summary>
-    public class PSLogProfile : LogProfileResource
+    public class PSAlertRuleResource : AlertRuleResource
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PSLogProfile"/> class.
+        /// Initializes a new instance of the PSAlertRuleResource class.
         /// </summary>
-        /// <param name="logProfile">The input logProfile</param>
-        public PSLogProfile(LogProfileResource logProfile)
+        /// <param name="ruleSpec"></param>
+        public PSAlertRuleResource(AlertRuleResource ruleSpec)
             : base(
-                id: logProfile.Id, 
-                name: logProfile.Name,
-                location: logProfile.Location, 
-                locations: logProfile.Locations, 
-                categories: logProfile.Categories,
-                retentionPolicy: new PSRetentionPolicy(logProfile.RetentionPolicy))
+               id: ruleSpec.Id,
+               location: ruleSpec.Location,
+               name: ruleSpec.Name,
+               type: ruleSpec.Type,
+               alertRuleResourceName: ruleSpec.Name,
+               isEnabled: ruleSpec.IsEnabled,
+               condition: ruleSpec.Condition,
+               lastUpdatedTime: ruleSpec.LastUpdatedTime)
         {
-            this.ServiceBusRuleId = logProfile.ServiceBusRuleId;
-            this.StorageAccountId = logProfile.StorageAccountId;
+            this.Tags = ruleSpec.Tags;
+            this.Actions = ruleSpec.Actions;
+            this.Description = ruleSpec.Description;
         }
     }
 }

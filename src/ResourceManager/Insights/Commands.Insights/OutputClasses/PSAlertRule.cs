@@ -19,19 +19,26 @@ namespace Microsoft.Azure.Commands.Insights.OutputClasses
     /// <summary>
     /// Wrapps around the RuleGetResponse
     /// </summary>
-    public class PSAlertRule : PSManagementItemDescriptorWithDetails
+    public class PSAlertRule : Resource
     {
+        /// <summary>
+        /// Gets or sets the Properties specification
+        /// </summary>
+        public AlertRuleResource Properties { get; set; }
+
         /// <summary>
         /// Initializes a new instance of the PSAlertRule class.
         /// </summary>
         /// <param name="ruleSpec"></param>
         public PSAlertRule(AlertRuleResource ruleSpec)
+            : base(
+               id: ruleSpec.Id,
+               location: ruleSpec.Location,
+               name: ruleSpec.Name,
+               type: ruleSpec.Type)
         {
-            this.Id = ruleSpec.Id;
-            this.Location = ruleSpec.Location;
-            this.Name = ruleSpec.Name;
-            this.Properties = new PSAlertRuleProperty(ruleSpec);
-            this.Tags = new PSDictionaryElement(ruleSpec.Tags);
+            this.Properties = new PSAlertRuleResource(ruleSpec);
+            this.Tags = ruleSpec.Tags;
         }
     }
 }

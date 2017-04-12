@@ -55,7 +55,7 @@ namespace Microsoft.Azure.Commands.Insights.LogProfiles
                 result.Add(new PSLogProfile(logProfile: logProfile));
             }
 
-            WriteObject(result);
+            WriteObject(result, enumerateCollection: true);
         }
     }
 }

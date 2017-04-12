@@ -12,30 +12,20 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using Microsoft.Azure.Management.Insights.Models;
-
-namespace Microsoft.Azure.Commands.Insights.OutputClasses
+namespace Microsoft.Azure.Insights.Models
 {
     /// <summary>
-    /// Wrapps around the ServiceDiagnosticSettings
+    /// Wraps around MetricAvailability
     /// </summary>
-    public class PSLogProfile : LogProfileResource
+    public class PSMetricAvailability : MetricAvailability
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PSLogProfile"/> class.
+        /// Initializes an new instance of the PSMetricAvailability class
         /// </summary>
-        /// <param name="logProfile">The input logProfile</param>
-        public PSLogProfile(LogProfileResource logProfile)
-            : base(
-                id: logProfile.Id, 
-                name: logProfile.Name,
-                location: logProfile.Location, 
-                locations: logProfile.Locations, 
-                categories: logProfile.Categories,
-                retentionPolicy: new PSRetentionPolicy(logProfile.RetentionPolicy))
+        /// <param name="metricAvailability">The metric availability</param>
+        public PSMetricAvailability(MetricAvailability metricAvailability)
+            : base(timeGrain: metricAvailability.TimeGrain, retention: metricAvailability.Retention)
         {
-            this.ServiceBusRuleId = logProfile.ServiceBusRuleId;
-            this.StorageAccountId = logProfile.StorageAccountId;
         }
     }
 }

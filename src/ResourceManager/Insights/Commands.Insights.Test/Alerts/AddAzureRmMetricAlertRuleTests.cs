@@ -50,7 +50,13 @@ namespace Microsoft.Azure.Commands.Insights.Test.Alerts
                 MonitorManagementClient = insightsManagementClientMock.Object
             };
 
-            AlertRuleResource alertRuleResourceInput = new AlertRuleResource(alertRuleResourceName: "a name", location: null, isEnabled: true);
+            AlertRuleResource alertRuleResourceInput = new AlertRuleResource()
+            {
+                AlertRuleResourceName = "a name", 
+                Location = null, 
+                IsEnabled = true
+            };
+
             response = new Rest.Azure.AzureOperationResponse<AlertRuleResource>()
             {
                 Body = alertRuleResourceInput

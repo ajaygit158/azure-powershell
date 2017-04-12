@@ -12,7 +12,6 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using System.Threading.Tasks;
 using Microsoft.Azure.Commands.Insights.OutputClasses;
 using Microsoft.Azure.Management.Insights;
 using Microsoft.Azure.Management.Insights.Models;
@@ -77,7 +76,11 @@ namespace Microsoft.Azure.Commands.Insights.LogProfiles
 
         protected override void ProcessRecordInternal()
         {
-            var putParameters = new LogProfileResource(location: string.Empty, locations: this.Locations);
+            var putParameters = new LogProfileResource()
+            {
+                Location = string.Empty,
+                Locations = this.Locations
+            };
 
             if (this.Categories == null)
             {

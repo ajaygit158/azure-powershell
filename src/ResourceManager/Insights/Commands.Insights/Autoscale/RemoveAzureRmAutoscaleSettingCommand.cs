@@ -13,7 +13,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Net;
-using Microsoft.Azure.Management.Insights;
+using Microsoft.Azure.Commands.Insights.OutputClasses;
 using System.Management.Automation;
 
 namespace Microsoft.Azure.Commands.Insights.Autoscale
@@ -21,7 +21,7 @@ namespace Microsoft.Azure.Commands.Insights.Autoscale
     /// <summary>
     /// Remove an autoscale setting.
     /// </summary>
-    [Cmdlet(VerbsCommon.Remove, "AzureRmAutoscaleSetting"), OutputType(typeof(AzureOperationResponse))]
+    [Cmdlet(VerbsCommon.Remove, "AzureRmAutoscaleSetting"), OutputType(typeof(PSAddAutoscaleSettingOperationResponse))]
     public class RemoveAzureRmAutoscaleSettingCommand : ManagementCmdletBase
     {
         internal const string RemoveAzureRmAutoscaleSettingParamGroup = "Parameters for Remove-AzureRmAutoscaleSetting cmdlet";
@@ -49,16 +49,14 @@ namespace Microsoft.Azure.Commands.Insights.Autoscale
         /// </summary>
         protected override void ProcessRecordInternal()
         {
-            WriteWarning("The output of this cmdlet will change. The cmdlet will not return anything in future releases.");
+            WriteWarning("The output of this cmdlet will change. Remove operations will not return anything in future releases.");
             var result = this.MonitorManagementClient.AutoscaleSettings.DeleteWithHttpMessagesAsync(resourceGroupName: this.ResourceGroup, autoscaleSettingName: this.Name).Result;
 
-            // Keep this response for backwards compatibility.
             // Note: Delete operations return nothing in the new specification.
-            var response = new AzureOperationResponse
+            var response = new PSAddAutoscaleSettingOperationResponse
             {
-                // There is no data about the request Id in the new SDK .Net.
                 RequestId = result.RequestId,
-                StatusCode = HttpStatusCode.OK
+                StatusCode = result.Response != null ? result.Response.StatusCode : HttpStatusCode.OK
             };
 
             WriteObject(response);

@@ -12,13 +12,22 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
+using Microsoft.Azure.Management.Insights.Models;
+
 namespace Microsoft.Azure.Commands.Insights.OutputClasses
 {
     /// <summary>
-    /// Wrapps around the EventData and exposes all the localized strings as invariant/localized properties
-    /// <para>It is an empty interface to allow for different types of outputs for the cmdlets, i.e. all the specific output types will implement this interface and the base cmdlet always returns lists of this type.</para>
+    /// Wrapps around the AutoscaleSettingGetResponse and AutoscaleSettingResource
     /// </summary>
-    public interface IPSEventData
+    public sealed class PSAutoscaleSettingNoDetails : PSAutoscaleSetting
     {
+        /// <summary>
+        /// Initializes a new instance of the PSAutoscaleSetting class.
+        /// </summary>
+        /// <param name="autoscaleSettingSpec">The autoscale setting spec</param>
+        public PSAutoscaleSettingNoDetails(AutoscaleSettingResource autoscaleSettingSpec)
+            : base(autoscaleSettingSpec)
+        {
+        }
     }
 }

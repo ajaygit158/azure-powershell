@@ -17,25 +17,13 @@ using Microsoft.Azure.Management.Insights.Models;
 namespace Microsoft.Azure.Commands.Insights.OutputClasses
 {
     /// <summary>
-    /// Wrapps around the ServiceDiagnosticSettings
+    /// Adds the newly added resource as part of the response
     /// </summary>
-    public class PSLogProfile : LogProfileResource
+    public class PSAddAlertRuleOperationResponse : AzureOperationResponse
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PSLogProfile"/> class.
+        /// Gets or sets the AlertRule
         /// </summary>
-        /// <param name="logProfile">The input logProfile</param>
-        public PSLogProfile(LogProfileResource logProfile)
-            : base(
-                id: logProfile.Id, 
-                name: logProfile.Name,
-                location: logProfile.Location, 
-                locations: logProfile.Locations, 
-                categories: logProfile.Categories,
-                retentionPolicy: new PSRetentionPolicy(logProfile.RetentionPolicy))
-        {
-            this.ServiceBusRuleId = logProfile.ServiceBusRuleId;
-            this.StorageAccountId = logProfile.StorageAccountId;
-        }
+        public AlertRuleResource AlertRule { get; set; }
     }
 }

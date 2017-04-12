@@ -13,16 +13,15 @@
 // ----------------------------------------------------------------------------------
 
 using System.Management.Automation;
+using System.Net;
 using System.Threading;
-using Microsoft.Azure.Management.Insights;
-using Microsoft.Rest.Azure;
 
 namespace Microsoft.Azure.Commands.Insights.LogProfiles
 {
     /// <summary>
     /// Removes the log profile.
     /// </summary>
-    [Cmdlet(VerbsCommon.Remove, "AzureRmLogProfile"), OutputType(typeof(bool))]
+    [Cmdlet(VerbsCommon.Remove, "AzureRmLogProfile"), OutputType(typeof(AzureOperationResponse))]
     public class RemoveAzureRmLogProfileCommand : ManagementCmdletBase
     {
 
@@ -39,9 +38,16 @@ namespace Microsoft.Azure.Commands.Insights.LogProfiles
 
         protected override void ProcessRecordInternal()
         {
-            WriteWarning("The output of this cmdlet will change. The cmdlet will not return anything in future releases.");
-            this.MonitorManagementClient.LogProfiles.DeleteAsync(logProfileName: this.Name, cancellationToken: CancellationToken.None).Wait();
-            WriteObject(true);
+            WriteWarning("The output of this cmdlet will change. Remove operations will not return anything in future releases.");
+            Rest.Azure.AzureOperationResponse result = this.MonitorManagementClient.LogProfiles.DeleteWithHttpMessagesAsync(logProfileName: this.Name, cancellationToken: CancellationToken.None).Result;
+
+            var response = new AzureOperationResponse
+            {
+                RequestId = result.RequestId,
+                StatusCode = result.Response != null ? result.Response.StatusCode : HttpStatusCode.OK
+            };
+
+            WriteObject(response);
         }
     }
 }

@@ -12,7 +12,6 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using System.Collections;
 using System.Collections.Generic;
 using Microsoft.Azure.Commands.Insights.OutputClasses;
 using Microsoft.Azure.Insights;
@@ -137,6 +136,8 @@ namespace Microsoft.Azure.Commands.Insights.UsageMetrics
         /// </summary>
         protected override void ProcessRecordInternal()
         {
+            WriteWarning("Get-AzureRmUsage will be deprecated in future releases.");
+
             var queryFilter = new ODataQuery<UsageMetric>(this.ProcessParameters());
             string apiVersion = this.ApiVersion ?? DefaultApiVersion;
 
@@ -148,7 +149,7 @@ namespace Microsoft.Azure.Commands.Insights.UsageMetrics
 
             var records = ExtractCollectionFromResult(response.GetEnumerator()).ToArray();
 
-            WriteObject(sendToPipeline: records);
+            WriteObject(sendToPipeline: records, enumerateCollection: true);
         }
     }
 }

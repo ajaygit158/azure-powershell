@@ -12,30 +12,22 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using Microsoft.Azure.Management.Insights.Models;
+using Microsoft.Azure.Insights.Models;
 
 namespace Microsoft.Azure.Commands.Insights.OutputClasses
 {
     /// <summary>
-    /// Wrapps around the ServiceDiagnosticSettings
+    /// Wraps around a list of Dimension objects to display them with indentation
     /// </summary>
-    public class PSLogProfile : LogProfileResource
+    public class PSLocalizableStringNoDetails : PSLocalizableString
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PSLogProfile"/> class.
+        /// Initializes a new instance of the PSLocalizableString class
         /// </summary>
-        /// <param name="logProfile">The input logProfile</param>
-        public PSLogProfile(LogProfileResource logProfile)
-            : base(
-                id: logProfile.Id, 
-                name: logProfile.Name,
-                location: logProfile.Location, 
-                locations: logProfile.Locations, 
-                categories: logProfile.Categories,
-                retentionPolicy: new PSRetentionPolicy(logProfile.RetentionPolicy))
+        /// <param name="localizableString">The input LocalizableString object</param>
+        public PSLocalizableStringNoDetails(LocalizableString localizableString)
+            : base(localizableString)
         {
-            this.ServiceBusRuleId = logProfile.ServiceBusRuleId;
-            this.StorageAccountId = logProfile.StorageAccountId;
         }
     }
 }

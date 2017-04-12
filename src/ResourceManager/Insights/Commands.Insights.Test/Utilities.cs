@@ -114,14 +114,17 @@ namespace Microsoft.Azure.Commands.Insights.Test
 
             return new AzureOperationResponse<LogProfileResource>()
             {
-                Body = new LogProfileResource(location: "East US", id: "MyLogProfileId", locations: new string[] { "EastUs" })
+                Body = new LogProfileResource(
+                    name:Utilities.Name,
+                    location: "East US", 
+                    id: "MyLogProfileId", 
+                    locations: new string[] { "EastUs" }, 
+                    categories: new List<string>() { "cat2" },
+                    retentionPolicy: new RetentionPolicy(enabled: true, days: 10))
 
                 {
-                    Categories = new List<string>() { "cat2" },
                     ServiceBusRuleId = "myBusId",
                     StorageAccountId = "myStorageAccId",
-                    Name = Utilities.Name,
-                    RetentionPolicy = new RetentionPolicy(enabled: true, days: 10),
                     Tags = null
                 }
             };
@@ -264,27 +267,29 @@ namespace Microsoft.Azure.Commands.Insights.Test
 
         public static AlertRuleResource CreateFakeRuleResource()
         {
+            var condition = new ThresholdRuleCondition()
+            {
+                DataSource = new RuleMetricDataSource()
+                {
+                    MetricName = "CpuTime",
+                    ResourceUri = ResourceUri,
+                },
+                OperatorProperty = ConditionOperator.GreaterThan,
+                Threshold = 3,
+                TimeAggregation = TimeAggregationOperator.Total,
+                WindowSize = TimeSpan.FromMinutes(5),
+            };
+
             return new AlertRuleResource(
                 id: "/subscriptions/a93fb07c-6c93-40be-bf3b-4f0deba10f4b/resourceGroups/Default-Web-EastUS/providers/microsoft.insights/alertrules/checkrule3-4b135401-a30c-4224-ae21-fa53a5bd253d",
                 location: "East US",
                 alertRuleResourceName: Name,
-                isEnabled: true)
+                isEnabled: true,
+                condition: condition)
             {
                 Actions = new BindingList<RuleAction>()
                 {
                     new RuleEmailAction(),
-                },
-                Condition = new ThresholdRuleCondition()
-                {
-                    DataSource = new RuleMetricDataSource()
-                    {
-                        MetricName = "CpuTime",
-                        ResourceUri = ResourceUri,
-                    },
-                    OperatorProperty = ConditionOperator.GreaterThan,
-                    Threshold = 3,
-                    TimeAggregation = TimeAggregationOperator.Total,
-                    WindowSize = TimeSpan.FromMinutes(5),
                 },
                 Description = null,
                 Tags = new Dictionary<string, string>()

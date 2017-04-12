@@ -25,7 +25,7 @@ namespace Microsoft.Azure.Commands.Insights.Autoscale
     /// <summary>
     /// Get an Alert rule
     /// </summary>
-    [Cmdlet(VerbsCommon.Get, "AzureRmAutoscaleSetting"), OutputType(typeof(List<AutoscaleSettingResource>))]
+    [Cmdlet(VerbsCommon.Get, "AzureRmAutoscaleSetting"), OutputType(typeof(List<PSAutoscaleSetting>))]
     public class GetAzureRmAutoscaleSettingCommand : ManagementCmdletBase
     {
         internal const string GetAzureRmAutoscaleSettingParamGroup = "Parameters for Get-AzureRmAustoscaleSetting cmdlet";
@@ -59,12 +59,13 @@ namespace Microsoft.Azure.Commands.Insights.Autoscale
         /// </summary>
         protected override void ProcessRecordInternal()
         {
+            WriteWarning("The AutoscaleSettingResourceName field will be deprecated in future versions since it always equals the Name field. In this version is optional.");
             if (string.IsNullOrWhiteSpace(this.Name))
             {
                 // Retrieve all the Autoscale settings for a resource group
                 IPage<AutoscaleSettingResource> result = this.MonitorManagementClient.AutoscaleSettings.ListByResourceGroupAsync(resourceGroupName: this.ResourceGroup).Result;
 
-                var records = result.Select(e => this.DetailedOutput.IsPresent ? new PSAutoscaleSetting(e) : e);
+                var records = result.Select(e => this.DetailedOutput.IsPresent ? new PSAutoscaleSetting(e) : new PSAutoscaleSettingNoDetails(e));
                 WriteObject(sendToPipeline: records, enumerateCollection: true);
             }
             else
@@ -72,7 +73,7 @@ namespace Microsoft.Azure.Commands.Insights.Autoscale
                 // Retrieve a single Autoscale setting determined by the resource group and the rule name
                 AutoscaleSettingResource result = this.MonitorManagementClient.AutoscaleSettings.GetAsync(resourceGroupName: this.ResourceGroup, autoscaleSettingName: this.Name).Result;
 
-                WriteObject(sendToPipeline: this.DetailedOutput.IsPresent ? new PSAutoscaleSetting(result) : result);
+                WriteObject(sendToPipeline: this.DetailedOutput.IsPresent ? new PSAutoscaleSetting(result) : new PSAutoscaleSettingNoDetails(result));
             }
         }
     }
