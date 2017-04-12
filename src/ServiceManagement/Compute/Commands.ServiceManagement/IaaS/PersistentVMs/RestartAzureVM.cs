@@ -13,6 +13,7 @@
 // ----------------------------------------------------------------------------------
 
 
+using System;
 using System.Management.Automation;
 using Microsoft.Azure;
 using Microsoft.WindowsAzure.Commands.ServiceManagement.Common;
@@ -29,6 +30,8 @@ namespace Microsoft.WindowsAzure.Commands.ServiceManagement.IaaS
         private const string RestartByNameParameterSet = "RestartByName";
         private const string RedployInputParameterSet = "RedeployInput";
         private const string RedployByNameParameterSet = "RedeployByName";
+        private const string InitiateMaintenanceInputParameterSet = "InitiateMaintenanceInput";
+        private const string InitiateMaintenanceByNameParameterSet = "InitiateMaintenanceByName";
 
         [Parameter(Position = 1,
             Mandatory = true,
@@ -40,6 +43,11 @@ namespace Microsoft.WindowsAzure.Commands.ServiceManagement.IaaS
             ValueFromPipelineByPropertyName = true,
             HelpMessage = "The name of the Virtual Machine to redeploy.",
             ParameterSetName = RedployByNameParameterSet)]
+        [Parameter(Position = 1,
+            Mandatory = true,
+            ValueFromPipelineByPropertyName = true,
+            HelpMessage = "The name of the Virual Machine to initiate maintenance.",
+            ParameterSetName = InitiateMaintenanceByNameParameterSet)]
         [ValidateNotNullOrEmpty]
         public string Name
         {
@@ -55,7 +63,12 @@ namespace Microsoft.WindowsAzure.Commands.ServiceManagement.IaaS
             ValueFromPipeline = true,
             HelpMessage = "The Virtual Machine to redeploy.",
             ParameterSetName = RedployInputParameterSet)]
+        [Parameter(Mandatory = true,
+            ValueFromPipeline = true,
+            HelpMessage = "The Virtual Machine to initiate maintenance.",
+            ParameterSetName = InitiateMaintenanceInputParameterSet)]
         [ValidateNotNullOrEmpty]
+        [ObsoleteAttribute("This parameter will be removed in the upcoming release. Use VM name instead.")]
         [Alias("InputObject")]
         public PersistentVM VM
         {
@@ -76,6 +89,19 @@ namespace Microsoft.WindowsAzure.Commands.ServiceManagement.IaaS
             set;
         }
 
+        [Parameter(Mandatory = true,
+            HelpMessage = "Initiate maintenance on the Virtual Machine",
+            ParameterSetName = InitiateMaintenanceInputParameterSet)]
+        [Parameter(Mandatory = true,
+            HelpMessage = "Initiate Maintenance on the Virtual Machine",
+            ParameterSetName = InitiateMaintenanceByNameParameterSet)]
+        [ValidateNotNullOrEmpty]
+        public SwitchParameter InitiateMaintenance
+        {
+            get;
+            set;
+        }
+
         protected override void ExecuteCommand()
         {
             WriteWarning("Breaking change notice: In upcoming release, VM parameter will be removed.");
@@ -87,7 +113,9 @@ namespace Microsoft.WindowsAzure.Commands.ServiceManagement.IaaS
                 return;
             }
 
+#pragma warning disable 0618
             string roleName = (this.ParameterSetName.Contains("ByName")) ? this.Name : this.VM.RoleName;
+#pragma warning restore 0618
 
             if (this.Redeploy.IsPresent)
             { // Redeploy VM
@@ -95,6 +123,14 @@ namespace Microsoft.WindowsAzure.Commands.ServiceManagement.IaaS
                 null,
                 CommandRuntime.ToString(),
                 () => this.ComputeClient.VirtualMachines.Redeploy(this.ServiceName, CurrentDeploymentNewSM.Name, roleName),
+                (s, response) => ContextFactory<OperationStatusResponse, ManagementOperationContext>(response, s));
+            }
+            else if (this.InitiateMaintenance.IsPresent)
+            { // Initiate Maintenance on VM
+                ExecuteClientActionNewSM(
+                null,
+                CommandRuntime.ToString(),
+                () => this.ComputeClient.VirtualMachines.InitiateMaintenance(this.ServiceName, CurrentDeploymentNewSM.Name, roleName),
                 (s, response) => ContextFactory<OperationStatusResponse, ManagementOperationContext>(response, s));
             }
             else
