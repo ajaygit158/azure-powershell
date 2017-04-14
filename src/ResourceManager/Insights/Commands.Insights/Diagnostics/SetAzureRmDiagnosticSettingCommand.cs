@@ -189,7 +189,8 @@ namespace Microsoft.Azure.Commands.Insights.Diagnostics
 
         private static DiagnosticSettingsResource CopySettings(DiagnosticSettingsResource properties)
         {
-            var putParameters = new DiagnosticSettingsResource(location: properties.Location, name: properties.Name, id: properties.Id, type: properties.Type)
+            // Location is marked as required, but the get operation returns Location as null. So use an empty string instead of null to avoid validation errors
+            var putParameters = new DiagnosticSettingsResource(location: properties.Location ?? string.Empty, name: properties.Name, id: properties.Id, type: properties.Type)
             {
                 Logs = properties.Logs,
                 Metrics = properties.Metrics,

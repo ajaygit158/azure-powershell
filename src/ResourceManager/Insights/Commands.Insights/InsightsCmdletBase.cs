@@ -12,9 +12,14 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
+using System.Globalization;
 using System.Management.Automation;
+using System.Net;
+using System.Net.PeerToPeer;
 using Microsoft.Azure.Commands.ResourceManager.Common;
 using System;
+using Microsoft.Azure.Insights.Models;
+using Microsoft.Rest;
 using Microsoft.Rest.Azure;
 
 namespace Microsoft.Azure.Commands.Insights
@@ -40,14 +45,65 @@ namespace Microsoft.Azure.Commands.Insights
             }
             catch (AggregateException ex)
             {
-                var exTemp = ex.Flatten().InnerException;
-                var cloudException = exTemp as CloudException;
-                if (cloudException != null)
+                // Process the exception to be as informative as possible to the user
+                var exTemp = ex.Flatten().InnerException ?? ex;
+                string exName = exTemp.GetType().Name;
+                string message = exTemp.Message;
+                string code = null;
+                HttpStatusCode? statusCode = null;
+                string reasonPhrase = null;
+
+                if (exTemp is RestException)
                 {
-                    throw new PSInvalidOperationException(cloudException.Message, cloudException);
+                    // All the following Exceptions have the same structure, but their common ancestor does not contain Body nor Response
+                    var cloudException = exTemp as CloudException;
+                    if (cloudException != null)
+                    {
+                        message = cloudException.Body.Message;
+                        code = cloudException.Body.Code;
+                        statusCode = cloudException.Response.StatusCode;
+                        reasonPhrase = cloudException.Response.ReasonPhrase;
+                    }
+                    else
+                    {
+                        // New model to report errors (from Swagger Spec)
+                        var errorResponse = exTemp as Microsoft.Azure.Insights.Models.ErrorResponseException;
+                        if (errorResponse != null)
+                        {
+                            message = errorResponse.Body.Message;
+                            code = errorResponse.Body.Code;
+                            statusCode = errorResponse.Response.StatusCode;
+                            reasonPhrase = errorResponse.Response.ReasonPhrase;
+                        }
+                        else
+                        {
+                            // New model to report errors (from Swagger Spec)
+                            var errorResponse2 = exTemp as Microsoft.Azure.Management.Insights.Models.ErrorResponseException;
+                            if (errorResponse2 != null)
+                            {
+                                message = errorResponse2.Body.Message;
+                                code = errorResponse2.Body.Code;
+                                statusCode = errorResponse2.Response.StatusCode;
+                                reasonPhrase = errorResponse2.Response.ReasonPhrase;
+                            }
+                            else
+                            {
+                                message = exTemp.Message;
+                            }
+                        }
+                    }
                 }
 
-                throw ex.Flatten().InnerException;
+                throw new PSInvalidOperationException(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Exception type: {0}, Message: {1}, Code: {2}, Status code:{3}, Reason phrase: {4}",
+                        exName,
+                        string.IsNullOrWhiteSpace(message) ? "Null/Empty" : message,
+                        code ?? "Null",
+                        statusCode.HasValue ? statusCode.Value.ToString() : "Null",
+                        reasonPhrase ?? "Null"),
+                    exTemp);
             }
         }
     }
