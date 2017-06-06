@@ -28,7 +28,7 @@ namespace Microsoft.Azure.Commands.Insights.Diagnostics
     /// <summary>
     /// Get the list of events for at a subscription level.
     /// </summary>
-    [Cmdlet(VerbsCommon.Set, "AzureRmDiagnosticSetting"), OutputType(typeof(PSServiceDiagnosticSettings))]
+    [Cmdlet(VerbsCommon.Set, "AzureRmDiagnosticSetting", SupportsShouldProcess = true), OutputType(typeof(PSServiceDiagnosticSettings))]
     public class SetAzureRmDiagnosticSettingCommand : ManagementCmdletBase
     {
         public const string StorageAccountIdParamName = "StorageAccountId";
@@ -120,6 +120,7 @@ namespace Microsoft.Azure.Commands.Insights.Diagnostics
         {
             HashSet<string> usedParams = new HashSet<string>(this.MyInvocation.BoundParameters.Keys, StringComparer.OrdinalIgnoreCase);
 
+            WriteDebug("Checking operation spec");
             this.isStorageParamPresent = usedParams.Contains(StorageAccountIdParamName);
             this.isServiceBusParamPresent = usedParams.Contains(ServiceBusRuleIdParamName);
             this.isEventHubRuleParamPresent = usedParams.Contains(EventHubRuleIdParamName);
@@ -135,44 +136,61 @@ namespace Microsoft.Azure.Commands.Insights.Diagnostics
                 throw new ArgumentException("No operation is specified");
             }
 
+            WriteDebug(string.Format("Retrieving existing diagnostic setting for resource: {0}", this.ResourceId));
             ServiceDiagnosticSettingsResource getResponse = this.MonitorManagementClient.ServiceDiagnosticSettings.GetAsync(resourceUri: this.ResourceId, cancellationToken: CancellationToken.None).Result;
 
             ServiceDiagnosticSettingsResource properties = getResponse;
 
+            WriteDebug("Setting up storage");
             SetStorage(properties);
 
+            WriteDebug("Setting up ServiceBus");
             SetServiceBus(properties);
 
+            WriteDebug("Setting up EventHub");
             SetEventHubRule(properties);
 
+            WriteDebug("Setting up workspace");
             SetWorkspace(properties);
 
             if (this.Categories == null && this.Timegrains == null)
             {
+                WriteDebug("Setting up ALL categories and timegrains");
                 SetAllCategoriesAndTimegrains(properties);
             }
             else
             {
                 if (this.Categories != null)
                 {
+                    WriteDebug("Setting up SELECTED categories");
                     SetSelectedCategories(properties);
                 }
 
                 if (this.Timegrains != null)
                 {
+                    WriteDebug("Setting up SELECTED timegrains");
                     SetSelectedTimegrains(properties);
                 }
             }
 
             if (this.RetentionEnabled.HasValue)
             {
+                WriteDebug("Setting up retention");
                 SetRetention(properties);
             }
 
+            WriteDebug("Copying settings");
             var putParameters = CopySettings(properties);
 
-            ServiceDiagnosticSettingsResource result = this.MonitorManagementClient.ServiceDiagnosticSettings.CreateOrUpdateAsync(resourceUri: this.ResourceId, parameters: putParameters, cancellationToken: CancellationToken.None).Result;
-            WriteObject(new PSServiceDiagnosticSettings(result));
+            if (ShouldProcess(
+                    target: string.Format("Setting diagnostic setting for resource: {0}", this.ResourceId),
+                    action: "Setting diagnostic setting for resource"))
+            {
+                WriteDebug("Operation confirmed");
+                ServiceDiagnosticSettingsResource result = this.MonitorManagementClient.ServiceDiagnosticSettings.CreateOrUpdateAsync(resourceUri: this.ResourceId, parameters: putParameters, cancellationToken: CancellationToken.None).Result;
+                WriteDebug("Operation finished");
+                WriteObject(new PSServiceDiagnosticSettings(result));
+            }
         }
 
         private static ServiceDiagnosticSettingsResource CopySettings(ServiceDiagnosticSettingsResource properties)

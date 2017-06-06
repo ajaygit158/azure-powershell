@@ -13,7 +13,6 @@
 // ----------------------------------------------------------------------------------
 
 using Microsoft.Azure.Management.Monitor.Management.Models;
-using System;
 using System.Collections.Generic;
 using System.Management.Automation;
 using Microsoft.Azure.Commands.Insights.OutputClasses;
@@ -23,7 +22,7 @@ namespace Microsoft.Azure.Commands.Insights.Alerts
     /// <summary>
     /// Add an Alert rule
     /// </summary>
-    [Cmdlet(VerbsCommon.Add, "AzureRmLogAlertRule"), OutputType(typeof(PSAddAlertRuleOperationResponse))]
+    [Cmdlet(VerbsCommon.Add, "AzureRmLogAlertRule", SupportsShouldProcess = true), OutputType(typeof(PSAddAlertRuleOperationResponse))]
     public class AddAzureRmLogAlertRuleCommand : AddAzureRmAlertRuleCommandBase
     {
         /// <summary>

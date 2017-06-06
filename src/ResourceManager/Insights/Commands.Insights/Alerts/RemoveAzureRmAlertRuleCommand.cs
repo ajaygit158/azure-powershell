@@ -21,7 +21,7 @@ namespace Microsoft.Azure.Commands.Insights.Alerts
     /// <summary>
     /// Remove an Alert rule
     /// </summary>
-    [Cmdlet(VerbsCommon.Remove, "AzureRmAlertRule"), OutputType(typeof(List<AzureOperationResponse>))]
+    [Cmdlet(VerbsCommon.Remove, "AzureRmAlertRule", SupportsShouldProcess = true), OutputType(typeof(List<AzureOperationResponse>))]
     public class RemoveAzureRmAlertRuleCommand : ManagementCmdletBase
     {
         internal const string RemoveAzureRmAlertRuleParamGroup = "Parameters for Remove-AzureRmAlertRule cmdlet";
@@ -49,21 +49,25 @@ namespace Microsoft.Azure.Commands.Insights.Alerts
         /// </summary>
         protected override void ProcessRecordInternal()
         {
-            WriteWarning("The type of the output will change in a future release to become a single object, not a list.");
-            var result = this.MonitorManagementClient.AlertRules.DeleteWithHttpMessagesAsync(resourceGroupName: this.ResourceGroup, ruleName: this.Name).Result;
-
-            // Keep this response for backwards compatibility.
-            // Note: Delete operations return nothing in the new specification.
-            var response = new List<AzureOperationResponse>
+            if (ShouldProcess(
+                    target: string.Format("Remove alert rule: {0} from resource group: {1}", this.Name, this.ResourceGroup),
+                    action: "Remove alert rule"))
             {
-                new AzureOperationResponse()
-                {
-                    RequestId = result.RequestId,
-                    StatusCode = result.Response != null ? result.Response.StatusCode : HttpStatusCode.OK
-                }
-            };
+                WriteWarning("The type of the output will change in a future release to become a single object, not a list.");
+                var result = this.MonitorManagementClient.AlertRules.DeleteWithHttpMessagesAsync(resourceGroupName: this.ResourceGroup, ruleName: this.Name).Result;
 
-            WriteObject(response);
+                // Keep this response for backwards compatibility.
+                var response = new List<AzureOperationResponse>
+                {
+                    new AzureOperationResponse()
+                    {
+                        RequestId = result.RequestId,
+                        StatusCode = result.Response != null ? result.Response.StatusCode : HttpStatusCode.OK
+                    }
+                };
+
+                WriteObject(response);
+            }
         }
     }
 }

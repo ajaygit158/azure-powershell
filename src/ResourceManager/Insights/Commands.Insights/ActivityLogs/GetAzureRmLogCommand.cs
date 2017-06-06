@@ -104,8 +104,10 @@ namespace Microsoft.Azure.Commands.Insights.Events
         /// <returns>The query filter with the conditions for particular parameters added</returns>
         protected override string ProcessParticularParameters(string currentQueryFilter)
         {
+            WriteDebug("Setting up maximum number of records");
             this.SetMaxEventsIfPresent(currentQueryFilter, this.MaxEvents);
 
+            WriteDebug("Adding more filters if present");
             string extendedQuery = this.AddConditionIfPResent(currentQueryFilter, "correlationId", this.CorrelationId);
             extendedQuery = this.AddConditionIfPResent(extendedQuery, "resourceGroupName", this.ResourceGroup);
 

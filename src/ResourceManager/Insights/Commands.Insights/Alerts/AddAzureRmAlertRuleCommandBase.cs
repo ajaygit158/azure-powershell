@@ -79,16 +79,21 @@ namespace Microsoft.Azure.Commands.Insights.Alerts
             AlertRuleResource parameters = this.CreateSdkCallParameters();
 
             // Part of the result of this operation is operation (result.Body ==> a AutoscaleSettingResource) is being discarded for backwards compatibility
-            var result = this.MonitorManagementClient.AlertRules.CreateOrUpdateWithHttpMessagesAsync(resourceGroupName: this.ResourceGroup, parameters: parameters, ruleName: parameters.AlertRuleResourceName).Result;
-
-            var response = new PSAddAlertRuleOperationResponse
+            if (ShouldProcess(
+                target: string.Format("Add/update alert rule: {0} to resource group: {1}", parameters.AlertRuleResourceName, this.ResourceGroup),
+                action: "Add/update alert rule"))
             {
-                RequestId = result.RequestId,
-                StatusCode = result.Response != null ? result.Response.StatusCode : HttpStatusCode.OK,
-                AlertRule = result.Body
-            };
+                var result = this.MonitorManagementClient.AlertRules.CreateOrUpdateWithHttpMessagesAsync(resourceGroupName: this.ResourceGroup, parameters: parameters, ruleName: parameters.AlertRuleResourceName).Result;
 
-            WriteObject(response);
+                var response = new PSAddAlertRuleOperationResponse
+                {
+                    RequestId = result.RequestId,
+                    StatusCode = result.Response != null ? result.Response.StatusCode : HttpStatusCode.OK,
+                    AlertRule = result.Body
+                };
+
+                WriteObject(response);
+            }
         }
 
         /// <summary>
