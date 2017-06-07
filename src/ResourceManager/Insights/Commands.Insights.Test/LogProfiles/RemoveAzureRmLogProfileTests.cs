@@ -15,9 +15,9 @@
 using System.Collections.Generic;
 using Microsoft.Azure.Commands.Insights.LogProfiles;
 using Microsoft.Azure.Management.Monitor.Management;
+using Microsoft.WindowsAzure.Commands.Common.Test.Mocks;
 using Microsoft.WindowsAzure.Commands.ScenarioTest;
 using Moq;
-using System.Management.Automation;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -29,7 +29,7 @@ namespace Microsoft.Azure.Commands.Insights.Test.LogProfiles
         private readonly RemoveAzureRmLogProfileCommand cmdlet;
         private readonly Mock<MonitorManagementClient> insightsManagementClientMock;
         private readonly Mock<ILogProfilesOperations> insightsLogProfilesOperationsMock;
-        private Mock<ICommandRuntime> commandRuntimeMock;
+        private MockCommandRuntime commandRuntimeMock;
         private string logProfileName;
 
         public RemoveAzureRmLogProfileTest(Xunit.Abstractions.ITestOutputHelper output)
@@ -37,10 +37,10 @@ namespace Microsoft.Azure.Commands.Insights.Test.LogProfiles
             ServiceManagemenet.Common.Models.XunitTracingInterceptor.AddToContext(new ServiceManagemenet.Common.Models.XunitTracingInterceptor(output));
             insightsLogProfilesOperationsMock = new Mock<ILogProfilesOperations>();
             insightsManagementClientMock = new Mock<MonitorManagementClient>();
-            commandRuntimeMock = new Mock<ICommandRuntime>();
+            commandRuntimeMock = new MockCommandRuntime();
             cmdlet = new RemoveAzureRmLogProfileCommand()
             {
-                CommandRuntime = commandRuntimeMock.Object,
+                CommandRuntime = commandRuntimeMock,
                 MonitorManagementClient = insightsManagementClientMock.Object
             };
 

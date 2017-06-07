@@ -12,13 +12,13 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using Microsoft.Azure.Commands.Insights.Alerts;
 using Microsoft.Azure.Management.Monitor.Management;
 using Microsoft.Azure.Management.Monitor.Management.Models;
-using Microsoft.Azure.ServiceManagemenet.Common.Models;
+using Microsoft.WindowsAzure.Commands.Common.Test.Mocks;
 using Microsoft.WindowsAzure.Commands.ScenarioTest;
 using Moq;
-using System.Management.Automation;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -30,45 +30,55 @@ namespace Microsoft.Azure.Commands.Insights.Test.Alerts
     {
         private readonly GetAzureRmAlertRuleCommand cmdlet;
         private readonly Mock<MonitorManagementClient> insightsManagementClientMock;
-        private readonly Mock<IAlertOperations> insightsAlertRuleOperationsMock;
-        private Mock<ICommandRuntime> commandRuntimeMock;
-        private RuleGetResponse singleResponse;
-        private RuleListResponse listResponse;
+        private readonly Mock<IAlertRulesOperations> insightsAlertRuleOperationsMock;
+        private MockCommandRuntime commandRuntimeMock;
+        private AlertRuleResource singleResponse;
+        private IEnumerable<AlertRuleResource> listResponse;
         private string resourceGroup;
-        private string ruleNameOrTargetUri;
+        private string ruleName;
 
         public GetAzureRmAlertRuleTests(ITestOutputHelper output)
         {
             //XunitTracingInterceptor.AddToContext(new XunitTracingInterceptor(output));
-            insightsAlertRuleOperationsMock = new Mock<IAlertOperations>();
+            insightsAlertRuleOperationsMock = new Mock<IAlertRulesOperations>();
             insightsManagementClientMock = new Mock<MonitorManagementClient>();
-            commandRuntimeMock = new Mock<ICommandRuntime>();
+            commandRuntimeMock = new MockCommandRuntime();
             cmdlet = new GetAzureRmAlertRuleCommand()
             {
-                CommandRuntime = commandRuntimeMock.Object,
+                CommandRuntime = commandRuntimeMock,
                 MonitorManagementClient = insightsManagementClientMock.Object
             };
 
             listResponse = Utilities.InitializeRuleListResponse();
-            singleResponse = Utilities.InitializeRuleGetResponse();
+            singleResponse = Utilities.CreateFakeRuleResource();
 
-            insightsAlertRuleOperationsMock.Setup(f => f.ListRulesAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult<RuleListResponse>(listResponse))
-                .Callback((string resourceGrp, string nameOrTargetUri, CancellationToken t) =>
+            var responseList = new Rest.Azure.AzureOperationResponse<IEnumerable<AlertRuleResource>>
+            {
+                Body = listResponse
+            };
+
+            var responseSingle = new Rest.Azure.AzureOperationResponse<AlertRuleResource>
+            {
+                Body = singleResponse
+            };
+
+            insightsAlertRuleOperationsMock.Setup(f => f.ListByResourceGroupWithHttpMessagesAsync(It.IsAny<string>(), It.IsAny<Dictionary<string, List<string>>>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult<Rest.Azure.AzureOperationResponse<IEnumerable<AlertRuleResource>>>(responseList))
+                .Callback((string resourceGrp, Dictionary<string, List<string>> h, CancellationToken t) =>
                 {
                     resourceGroup = resourceGrp;
-                    ruleNameOrTargetUri = nameOrTargetUri;
+                    ruleName = null;
                 });
 
-            insightsAlertRuleOperationsMock.Setup(f => f.GetRuleAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult<RuleGetResponse>(singleResponse))
-                .Callback((string resourceGrp, string nameOrTargetUri, CancellationToken t) =>
+            insightsAlertRuleOperationsMock.Setup(f => f.GetWithHttpMessagesAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, List<string>>>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult<Rest.Azure.AzureOperationResponse<AlertRuleResource>>(responseSingle))
+                .Callback((string resourceGrp, string ruleNm, Dictionary<string, List<string>> h, CancellationToken t) =>
                 {
                     resourceGroup = resourceGrp;
-                    ruleNameOrTargetUri = nameOrTargetUri;
+                    ruleName = ruleNm;
                 });
 
-            insightsManagementClientMock.SetupGet(f => f.AlertOperations).Returns(this.insightsAlertRuleOperationsMock.Object);
+            insightsManagementClientMock.SetupGet(f => f.AlertRules).Returns(this.insightsAlertRuleOperationsMock.Object);
         }
 
         [Fact]
@@ -82,7 +92,14 @@ namespace Microsoft.Azure.Commands.Insights.Test.Alerts
                 cmdlet: cmdlet,
                 expectedResourceGroup: Utilities.ResourceGroup,
                 resourceGroup: ref this.resourceGroup,
-                nameOrTargetUri: ref this.ruleNameOrTargetUri);
+                ruleName: ref this.ruleName);
+
+            cmdlet.TargetResourceId = Utilities.ResourceUri;
+            Utilities.ExecuteVerifications(
+                cmdlet: cmdlet,
+                expectedResourceGroup: Utilities.ResourceGroup,
+                resourceGroup: ref this.resourceGroup,
+                ruleName: ref this.ruleName);
         }
     }
 }

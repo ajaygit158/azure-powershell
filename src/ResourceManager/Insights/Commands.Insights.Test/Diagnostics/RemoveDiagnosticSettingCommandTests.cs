@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Commands.Insights.Diagnostics;
 using Microsoft.Azure.Management.Monitor.Management;
-
+using Microsoft.WindowsAzure.Commands.Common.Test.Mocks;
 using Microsoft.WindowsAzure.Commands.ScenarioTest;
 using Moq;
 using Xunit;
@@ -30,7 +30,7 @@ namespace Microsoft.Azure.Commands.Insights.Test.Diagnostics
         private readonly RemoveAzureRmDiagnosticSettingCommand cmdlet;
         private readonly Mock<MonitorManagementClient> insightsManagementClientMock;
         private readonly Mock<IDiagnosticSettingsOperations> insightsDiagnosticsOperationsMock;
-        private Mock<ICommandRuntime> commandRuntimeMock;
+        private MockCommandRuntime commandRuntimeMock;
         private const string ResourceId = "/subscriptions/123/resourcegroups/rg/providers/rp/resource/myresource";
 
         private string resourceIdIn;

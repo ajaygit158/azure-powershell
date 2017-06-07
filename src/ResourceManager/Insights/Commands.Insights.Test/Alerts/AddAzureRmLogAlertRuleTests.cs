@@ -12,18 +12,15 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using Microsoft.Azure.Commands.Common.Authentication;
 using Microsoft.Azure.Commands.Insights.Alerts;
-using Microsoft.Azure.Commands.ResourceManager.Common;
 using Microsoft.Azure.Commands.ScenarioTest;
 using Microsoft.Azure.Management.Monitor.Management;
 using Microsoft.Azure.Management.Monitor.Management.Models;
+using Microsoft.WindowsAzure.Commands.Common.Test.Mocks;
 using Microsoft.WindowsAzure.Commands.ScenarioTest;
 using Moq;
-using System;
 using System.Collections.Generic;
 using System.Management.Automation;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -36,7 +33,7 @@ namespace Microsoft.Azure.Commands.Insights.Test.Alerts
         private readonly AddAzureRmLogAlertRuleCommand cmdlet;
         private readonly Mock<MonitorManagementClient> insightsManagementClientMock;
         private readonly Mock<IAlertRulesOperations> insightsAlertRuleOperationsMock;
-        private Mock<ICommandRuntime> commandRuntimeMock;
+        private MockCommandRuntime commandRuntimeMock;
         private Rest.Azure.AzureOperationResponse<AlertRuleResource> response;
         private string resourceGroup;
         private AlertRuleResource createOrUpdatePrms;
@@ -47,10 +44,10 @@ namespace Microsoft.Azure.Commands.Insights.Test.Alerts
             // XunitTracingInterceptor.AddToContext(new XunitTracingInterceptor(output));
             insightsAlertRuleOperationsMock = new Mock<IAlertRulesOperations>();
             insightsManagementClientMock = new Mock<MonitorManagementClient>();
-            commandRuntimeMock = new Mock<ICommandRuntime>();
+            commandRuntimeMock = new MockCommandRuntime();
             cmdlet = new AddAzureRmLogAlertRuleCommand()
             {
-                CommandRuntime = commandRuntimeMock.Object,
+                CommandRuntime = commandRuntimeMock,
                 MonitorManagementClient = insightsManagementClientMock.Object
             };
 

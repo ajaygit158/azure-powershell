@@ -15,12 +15,9 @@
 using System.Collections.Generic;
 using Microsoft.Azure.Commands.Insights.Autoscale;
 using Microsoft.Azure.Management.Monitor.Management;
-using Microsoft.Azure.Management.Monitor.Management.Models;
+using Microsoft.WindowsAzure.Commands.Common.Test.Mocks;
 using Microsoft.WindowsAzure.Commands.ScenarioTest;
 using Moq;
-using System;
-using System.Management.Automation;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -32,7 +29,7 @@ namespace Microsoft.Azure.Commands.Insights.Test.Autoscale
         private readonly RemoveAzureRmAutoscaleSettingCommand cmdlet;
         private readonly Mock<MonitorManagementClient> insightsManagementClientMock;
         private readonly Mock<IAutoscaleSettingsOperations> insightsAutoscaleOperationsMock;
-        private Mock<ICommandRuntime> commandRuntimeMock;
+        private MockCommandRuntime commandRuntimeMock;
         private string resourceGroup;
         private string settingName;
 
@@ -41,10 +38,10 @@ namespace Microsoft.Azure.Commands.Insights.Test.Autoscale
             //ServiceManagemenet.Common.Models.XunitTracingInterceptor.AddToContext(new ServiceManagemenet.Common.Models.XunitTracingInterceptor(output));
             insightsAutoscaleOperationsMock = new Mock<IAutoscaleSettingsOperations>();
             insightsManagementClientMock = new Mock<MonitorManagementClient>();
-            commandRuntimeMock = new Mock<ICommandRuntime>();
+            commandRuntimeMock = new MockCommandRuntime();
             cmdlet = new RemoveAzureRmAutoscaleSettingCommand()
             {
-                CommandRuntime = commandRuntimeMock.Object,
+                CommandRuntime = commandRuntimeMock,
                 MonitorManagementClient = insightsManagementClientMock.Object
             };
 

@@ -13,6 +13,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using Microsoft.Azure.Commands.Insights.OutputClasses;
 using Microsoft.Azure.Commands.Insights.UsageMetrics;
 using Microsoft.Azure.Management.Monitor;
 using Microsoft.Azure.Management.Monitor.Models;
@@ -33,7 +34,7 @@ namespace Microsoft.Azure.Commands.Insights.Test.Metrics
         private readonly Mock<MonitorClient> MonitorClientMock;
         private readonly Mock<IUsageMetricsOperations> insightsUsageMetricOperationsMock;
         private Mock<ICommandRuntime> commandRuntimeMock;
-        private Microsoft.Rest.Azure.AzureOperationResponse<IEnumerable<Microsoft.Azure.Management.Monitor.Models.UsageMetric>> response;
+        private Microsoft.Rest.Azure.AzureOperationResponse<IEnumerable<UsageMetric>> response;
         private string resourceId;
         private ODataQuery<UsageMetric> filter;
         private string apiVersion;
@@ -52,7 +53,19 @@ namespace Microsoft.Azure.Commands.Insights.Test.Metrics
 
             response = new Microsoft.Rest.Azure.AzureOperationResponse<IEnumerable<UsageMetric>>()
             {
-                Body = new List<UsageMetric>()
+                Body = new List<PSUsageMetric>
+                {
+                    new PSUsageMetric(new UsageMetric
+                    {
+                        CurrentValue = 1.1,
+                        Id = "MerticId",
+                        Limit = -2,
+                        Name = new LocalizableString("name", "nameLoc"),
+                        NextResetTime = DateTime.Now.AddDays(2),
+                        QuotaPeriod = TimeSpan.FromHours(2),
+                        Unit = "mm"
+                    })
+                }
             };
 
             insightsUsageMetricOperationsMock

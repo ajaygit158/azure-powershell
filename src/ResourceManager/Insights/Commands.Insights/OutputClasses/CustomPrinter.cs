@@ -29,92 +29,102 @@ namespace Microsoft.Azure.Commands.Insights.OutputClasses
         /// <param name="obj">The object</param>
         public static string Print(object obj)
         {
-            StringBuilder sb = new StringBuilder();
-            Print(obj, "", "", sb);
-
-            return sb.ToString();
-        }
-
-        private static void Print(object obj, string name, string currentIndent, StringBuilder sb)
-        {
-            string propName;
-            //Builds the property name
-            if (!string.IsNullOrWhiteSpace(name))
-            {
-                propName = currentIndent + name;
-            }
-            else
-            {
-                propName = "";
-            }
-
-            //Check for null
             if (obj == null)
             {
-                sb.Append(propName);
-                sb.AppendLine(" :");
+                return string.Empty;
+            }
+
+            var sb = new StringBuilder();
+            Print(obj, 0, sb);
+
+            var output = sb.ToString();
+            return output.EndsWith("\r\n") ? output.Substring(0, output.Length - 2) : output;
+        }
+
+        private static void Print(object obj, int currentIndent, StringBuilder sb)
+        {
+            if (obj == null)
+            {
+                sb.AppendLine();
                 return;
             }
 
             //Handles the basic types
+            if (obj is DateTime)
+            {
+                var objAsDateTime = (DateTime)obj;
+                sb.AppendLine(objAsDateTime.Kind != DateTimeKind.Utc
+                    ? objAsDateTime.ToUniversalTime().ToString("O")
+                    : objAsDateTime.ToString("O"));
+
+                return;
+            }
+
             if (obj is TimeSpan)
             {
-                TimeSpan objAsTimeSpan = (TimeSpan)obj;
-                sb.Append(currentIndent);
-                sb.Append(name);
-                sb.Append(" : ");
+                var objAsTimeSpan = (TimeSpan)obj;
                 sb.AppendLine(XmlConvert.ToString(objAsTimeSpan));
                 return;
             }
-            else if (obj is System.String || obj is System.ValueType)
+
+            if (obj is System.String || obj is System.ValueType)
             {
-                sb.Append(currentIndent);
-                sb.Append(name);
-                sb.Append(" : ");
                 sb.AppendLine(obj.ToString());
                 return;
             }
 
-            string nextIndent = currentIndent + "    ";
-
-            ICollection objAsCollection = obj as ICollection;
-
-            propName = propName.Replace(':', ' ');
-            if (!string.IsNullOrWhiteSpace(propName))
+            if (obj is ICollection)
             {
-                sb.AppendLine(propName);
-            }
-
-            if (objAsCollection != null)
-            {
-                foreach (object item in objAsCollection)
+                var atLeastOne = false;
+                sb.Append("{");
+                foreach (var item in ((ICollection)obj))
                 {
-                    Print(item, "", nextIndent, sb);
+                    if (!atLeastOne)
+                    {
+                        atLeastOne = true;
+                        sb.AppendLine();
+                    }
+
+                    sb.AppendRepeated(' ', currentIndent);
+                    Print(item, currentIndent + 3, sb);
                 }
 
+                if (atLeastOne)
+                {
+                    sb.AppendRepeated(' ', currentIndent);
+                }
+
+                sb.AppendLine("}");
                 return;
             }
 
+            // Handle an arbitrary object (no simple type, no collection)
             Type type = obj.GetType();
             PropertyInfo[] properties = type.GetProperties();
+            int nameLength = properties.Max(x => x.Name.Length);
 
-            int size = properties.Max(x => x.Name.Length);
-
+            sb.AppendLine("[");
             foreach (PropertyInfo property in properties)
             {
-                StringBuilder normalizedName = new StringBuilder(property.Name);
-                normalizedName.AppendRepeated(' ', size - property.Name.Length);
-                Print(property.GetValue(obj), normalizedName.ToString(), currentIndent, sb);
+                sb.AppendRepeated(' ', currentIndent);
+                sb.Append(property.Name);
+                sb.AppendRepeated(' ', nameLength - property.Name.Length + 1);
+                sb.Append(": ");
+                Print(property.GetValue(obj), currentIndent + nameLength + 3, sb);
             }
 
-            sb.AppendLine();
+            sb.AppendRepeated(' ', currentIndent);
+            sb.AppendLine("]");
         }
 
-        public static void AppendRepeated(this StringBuilder sb, char c, int count)
+        private static void AppendRepeated(this StringBuilder sb, char c, int count)
         {
-            for (int i = 0; i < count; i++)
+            if (sb != null)
             {
-                sb.Append(c);
+                for (int i = 0; i < count; i++)
+                {
+                    sb.Append(c);
+                }
             }
         }
     }

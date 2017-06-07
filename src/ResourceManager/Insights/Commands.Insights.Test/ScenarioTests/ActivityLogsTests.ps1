@@ -177,12 +177,12 @@ function Test-GetAzureSubscriptionIdLogPaged
     try 
     {
         {
-            $actual = Get-AzureRmLog -starttime 2015-01-15T12:30:00Z -endtime 2015-01-15T20:30:00Z 
+            $actual = Get-AzureRmLog -starttime 2015-01-15T12:30:00Z -endtime 2015-01-15T20:30:00Z -debug
             Assert-AreEqual 7 $actual.Count
         }
 
         {
-            $actual = Get-AzureRmLog -starttime 2015-01-15T12:30:00Z -endtime 2015-01-15T20:30:00Z -MaxEvents 3
+            $actual = Get-AzureRmLog -starttime 2015-01-15T12:30:00Z -endtime 2015-01-15T20:30:00Z -MaxEvents 3 -debug
             Assert-AreEqual 3 $actual.Count
         }
     }

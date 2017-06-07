@@ -12,19 +12,17 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using Microsoft.Azure.Commands.Common.Authentication;
 using Microsoft.Azure.Commands.Insights.Autoscale;
 using Microsoft.Azure.Commands.Insights.OutputClasses;
-using Microsoft.Azure.Commands.ResourceManager.Common;
 using Microsoft.Azure.Commands.ScenarioTest;
 using Microsoft.Azure.Management.Monitor.Management;
 using Microsoft.Azure.Management.Monitor.Management.Models;
 using Microsoft.Rest.Azure;
+using Microsoft.WindowsAzure.Commands.Common.Test.Mocks;
 using Microsoft.WindowsAzure.Commands.ScenarioTest;
 using Moq;
 using System;
 using System.Collections.Generic;
-using System.Management.Automation;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -36,7 +34,7 @@ namespace Microsoft.Azure.Commands.Insights.Test.Autoscale
         private readonly AddAzureRmAutoscaleSettingCommand cmdlet;
         private readonly Mock<MonitorManagementClient> insightsManagementClientMock;
         private readonly Mock<IAutoscaleSettingsOperations> insightsAutoscaleOperationsMock;
-        private Mock<ICommandRuntime> commandRuntimeMock;
+        private MockCommandRuntime commandRuntimeMock;
         private Microsoft.Rest.Azure.AzureOperationResponse<AutoscaleSettingResource> response;
         private string resourceGroup;
         private string settingName;
@@ -48,10 +46,10 @@ namespace Microsoft.Azure.Commands.Insights.Test.Autoscale
             //ServiceManagemenet.Common.Models.XunitTracingInterceptor.AddToContext(new ServiceManagemenet.Common.Models.XunitTracingInterceptor(output));
             insightsAutoscaleOperationsMock = new Mock<IAutoscaleSettingsOperations>();
             insightsManagementClientMock = new Mock<MonitorManagementClient>();
-            commandRuntimeMock = new Mock<ICommandRuntime>();
+            commandRuntimeMock = new MockCommandRuntime();
             cmdlet = new AddAzureRmAutoscaleSettingCommand()
             {
-                CommandRuntime = commandRuntimeMock.Object,
+                CommandRuntime = commandRuntimeMock,
                 MonitorManagementClient = insightsManagementClientMock.Object
             };
 

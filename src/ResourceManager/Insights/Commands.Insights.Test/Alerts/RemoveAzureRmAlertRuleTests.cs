@@ -12,12 +12,14 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+using System.Net.Http;
 using Microsoft.Azure.Commands.Insights.Alerts;
 using Microsoft.Azure.Management.Monitor.Management;
+using Microsoft.WindowsAzure.Commands.Common.Test.Mocks;
 using Microsoft.WindowsAzure.Commands.ScenarioTest;
 using Moq;
 using System;
-using System.Management.Automation;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,39 +31,42 @@ namespace Microsoft.Azure.Commands.Insights.Test.Alerts
     {
         private readonly RemoveAzureRmAlertRuleCommand cmdlet;
         private readonly Mock<MonitorManagementClient> insightsManagementClientMock;
-        private readonly Mock<IAlertOperations> insightsAlertRuleOperationsMock;
-        private Mock<ICommandRuntime> commandRuntimeMock;
-        private AzureOperationResponse response;
+        private readonly Mock<IAlertRulesOperations> insightsAlertRuleOperationsMock;
+        private MockCommandRuntime commandRuntimeMock;
+        private Microsoft.Rest.Azure.AzureOperationResponse response;
         private string resourceGroup;
         private string ruleNameOrTargetUri;
 
         public RemoveAzureRmAlertRuleTests(Xunit.Abstractions.ITestOutputHelper output)
         {
             ServiceManagemenet.Common.Models.XunitTracingInterceptor.AddToContext(new ServiceManagemenet.Common.Models.XunitTracingInterceptor(output));
-            insightsAlertRuleOperationsMock = new Mock<IAlertOperations>();
+            insightsAlertRuleOperationsMock = new Mock<IAlertRulesOperations>();
             insightsManagementClientMock = new Mock<MonitorManagementClient>();
-            commandRuntimeMock = new Mock<ICommandRuntime>();
+            commandRuntimeMock = new MockCommandRuntime();
             cmdlet = new RemoveAzureRmAlertRuleCommand()
             {
-                CommandRuntime = commandRuntimeMock.Object,
+                CommandRuntime = commandRuntimeMock,
                 MonitorManagementClient = insightsManagementClientMock.Object
             };
 
-            response = new AzureOperationResponse()
+            response = new Microsoft.Rest.Azure.AzureOperationResponse()
             {
                 RequestId = Guid.NewGuid().ToString(),
-                StatusCode = HttpStatusCode.OK,
+                Response = new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK    
+                }
             };
 
-            insightsAlertRuleOperationsMock.Setup(f => f.DeleteRuleAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult<AzureOperationResponse>(response))
-                .Callback((string resourceGrp, string ruleName, CancellationToken t) =>
+            insightsAlertRuleOperationsMock.Setup(f => f.DeleteWithHttpMessagesAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, List<string>>>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(response))
+                .Callback((string resourceGrp, string ruleName, Dictionary<string, List<string>> h, CancellationToken t) =>
                 {
                     resourceGroup = resourceGrp;
                     ruleNameOrTargetUri = ruleName;
                 });
 
-            insightsManagementClientMock.SetupGet(f => f.AlertOperations).Returns(this.insightsAlertRuleOperationsMock.Object);
+            insightsManagementClientMock.SetupGet(f => f.AlertRules).Returns(this.insightsAlertRuleOperationsMock.Object);
         }
 
         [Fact]

@@ -213,7 +213,7 @@ namespace Microsoft.Azure.Commands.Insights
 
             // Call the proper API methods to return a list of raw records. In the future this pattern can be extended to include DigestRecords
             // If fullDetails is present do not select fields, if not present fetch only the SelectedFieldsForQuery
-            WriteDebug("First call");
+            WriteDebug(string.Format("First call. Client is != null: {0}", this.MonitorClient != null));
             var query = new ODataQuery<EventData>(queryFilter);
             IPage<EventData> response = this.MonitorClient.ActivityLogs.ListAsync(odataQuery: query, select: fullDetails ? null : PSEventDataNoDetails.SelectedFieldsForQuery, cancellationToken: CancellationToken.None).Result;
             var records = new List<IPSEventData>();

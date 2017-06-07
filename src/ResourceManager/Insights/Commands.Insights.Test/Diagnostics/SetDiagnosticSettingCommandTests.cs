@@ -21,6 +21,7 @@ using Microsoft.Azure.Commands.Insights.Diagnostics;
 using Microsoft.Azure.Management.Monitor.Management;
 using Microsoft.Azure.Management.Monitor.Management.Models;
 using Microsoft.Rest.Azure;
+using Microsoft.WindowsAzure.Commands.Common.Test.Mocks;
 using Microsoft.WindowsAzure.Commands.ScenarioTest;
 using Moq;
 using Xunit;
@@ -32,7 +33,7 @@ namespace Microsoft.Azure.Commands.Insights.Test.Diagnostics
         private readonly SetAzureRmDiagnosticSettingCommand cmdlet;
         private readonly Mock<MonitorManagementClient> insightsManagementClientMock;
         private readonly Mock<IServiceDiagnosticSettingsOperations> insightsDiagnosticsOperationsMock;
-        private Mock<ICommandRuntime> commandRuntimeMock;
+        private MockCommandRuntime commandRuntimeMock;
         private const string resourceId = "/subscriptions/123/resourcegroups/rg/providers/rp/resource/myresource";
         private const string storageAccountId = "/subscriptions/123/resourcegroups/rg/providers/microsoft.storage/accounts/myaccount";
         private const string serviceBusRuleId = "/subscriptions/123/resourcegroups/rg/providers/microsoft.eventhub/namespaces/ns/authorizationrules/ar";
@@ -46,10 +47,10 @@ namespace Microsoft.Azure.Commands.Insights.Test.Diagnostics
         {
             this.insightsDiagnosticsOperationsMock = new Mock<IServiceDiagnosticSettingsOperations>();
             this.insightsManagementClientMock = new Mock<MonitorManagementClient>();
-            this.commandRuntimeMock = new Mock<ICommandRuntime>();
+            this.commandRuntimeMock = new MockCommandRuntime();
             this.cmdlet = new SetAzureRmDiagnosticSettingCommand()
             {
-                CommandRuntime = commandRuntimeMock.Object,
+                CommandRuntime = commandRuntimeMock,
                 MonitorManagementClient = insightsManagementClientMock.Object
             };
             

@@ -43,7 +43,7 @@ namespace Microsoft.Azure.Commands.Insights.Test
 
         #region Events
 
-        public static EventData CreateFakeEvent(string id = null)
+        public static EventData CreateFakeEvent(string id = null, bool newDates = true)
         {
             return new EventData(
                 id: id ?? "ac7d2ab5-698a-4c33-9c19-0a93d3d7f527",
@@ -67,7 +67,7 @@ namespace Microsoft.Azure.Commands.Insights.Test
                 correlationId: Correlation,
                 description: "fake event",
                 level: EventLevel.Informational,
-                eventTimestamp: DateTime.Now,
+                eventTimestamp: newDates ? DateTime.Now : new DateTime(2017, 06, 07, 15, 54, 00, DateTimeKind.Local),
                 operationId: "c0f2e85f-efb0-47d0-bf90-f983ec8be91d",
                 operationName: new LocalizableString(
                     localizedValue: "Microsoft.Resources/subscriptions/resourcegroups/deployments/write",
@@ -89,7 +89,7 @@ namespace Microsoft.Azure.Commands.Insights.Test
                     clientRequestId: "1234",
                     clientIpAddress: "123.123.123.123"),
                 properties: new Dictionary<string, string>(),
-                submissionTimestamp: DateTime.Now);
+                submissionTimestamp: newDates ? DateTime.Now : new DateTime(2017, 06, 07, 15, 54, 00, DateTimeKind.Local));
         }
 
         public static List<EventData> CreateListOfFakeEvents(int numEvents = 1)
@@ -102,6 +102,12 @@ namespace Microsoft.Azure.Commands.Insights.Test
             {
                 // The rest of the events in the list have a unique id
                 events.Add(CreateFakeEvent(Guid.NewGuid().ToString()));
+            }
+
+            // This is only to increase code coverage during testing
+            if (numEvents > 1)
+            {
+                events[1].ResourceId = null;
             }
 
             return events;
@@ -329,7 +335,17 @@ namespace Microsoft.Azure.Commands.Insights.Test
 
         #region Alerts
 
-        public static AlertRuleResource CreateFakeRuleResource()
+        public static AlertRuleResource CreateFakeRuleResource(int type = 0)
+        {
+            if (type == 1)
+            {
+                return CreateFakeLocationRuleResource();
+            }
+
+            return type == 2 ? CreateFakeManagementRuleResource() : CreateFakeThresholdRuleResource();
+        }
+
+        public static AlertRuleResource CreateFakeThresholdRuleResource()
         {
             var condition = new ThresholdRuleCondition()
             {
@@ -364,48 +380,92 @@ namespace Microsoft.Azure.Commands.Insights.Test
             };
         }
 
-        /*
-        public static RuleListResponse InitializeRuleListResponse()
+        public static AlertRuleResource CreateFakeLocationRuleResource()
         {
-            // This is effectively testing the conversion EventData -> PSEventData internally in the execution of the cmdlet
-            AlertRuleResource ruleResource = Utilities.CreateFakeRuleResource();
-            return new RuleListResponse()
+            var condition = new LocationThresholdRuleCondition()
             {
-                RuleResourceCollection = new RuleResourceCollection()
+                DataSource = new RuleMetricDataSource()
                 {
-                    Value = new List<AlertRuleResource>() { ruleResource },
+                    MetricName = "CpuTime",
+                    ResourceUri = ResourceUri,
                 },
-                RequestId = Guid.NewGuid().ToString(),
-                StatusCode = HttpStatusCode.OK
+                FailedLocationCount = 2,
+                WindowSize = TimeSpan.FromMinutes(5)
+            };
+
+            return new AlertRuleResource(
+                id: "/subscriptions/a93fb07c-6c93-40be-bf3b-4f0deba10f4b/resourceGroups/Default-Web-EastUS/providers/microsoft.insights/alertrules/checkrule3-4b135401-a30c-4224-ae21-fa53a5bd253d",
+                location: "East US",
+                alertRuleResourceName: Name + "_Location",
+                isEnabled: true,
+                condition: condition)
+            {
+                Actions = new BindingList<RuleAction>()
+                {
+                    new RuleEmailAction(),
+                },
+                Description = null,
+                Tags = new Dictionary<string, string>()
+                {
+                    {"$type", "Microsoft.WindowsAzure.Management.Common.Storage.CasePreservedDictionary,Microsoft.WindowsAzure.Management.Common.Storage"},
+                    {"hidden-link:/subscriptions/a93fb07c-6c93-40be-bf3b-4f0deba10f4b/resourceGroups/Default-Web-EastUS/providers/microsoft.web/sites/garyyang1","Resource"}
+                },
             };
         }
 
-        public static RuleGetResponse InitializeRuleGetResponse()
+        public static AlertRuleResource CreateFakeManagementRuleResource()
         {
-            // This is effectively testing the conversion EventData -> PSEventData internally in the execution of the cmdlet
-            AlertRuleResource ruleResource = Utilities.CreateFakeRuleResource();
-            return new RuleGetResponse()
+            var condition = new ManagementEventRuleCondition()
             {
-                Id = ruleResource.Id,
-                Location = ruleResource.Location,
-                Name = ruleResource.Name,
-                Properties = ruleResource.Properties,
-                Tags = ruleResource.Tags,
-                RequestId = Guid.NewGuid().ToString(),
-                StatusCode = HttpStatusCode.OK
+                DataSource = new RuleManagementEventDataSource()
+                {
+                    ResourceUri = ResourceUri,
+                    EventName = "SomeEvent",
+                    EventSource = "SomeEventSource",
+                    Level = "SomeLevel",
+                    OperationName = "SomeOpereationName",
+                    ResourceGroupName = "SomeResourceGroupName",
+                    ResourceProviderName = "SomeResourceProviderName",
+                    Status = "SomeStatus",
+                    SubStatus = "SomeSubStatus",
+                    Claims = null
+                },
+                Aggregation = new ManagementEventAggregationCondition()
+                {
+                    OperatorProperty = ConditionOperator.GreaterThan,
+                    Threshold = 12.5,
+                    WindowSize = TimeSpan.FromMinutes(5)
+                }
             };
-        } */
 
-        public static void VerifyDetailedOutput(GetAzureRmAlertRuleCommand cmdlet, string expectedResourceGroup, ref string resourceGroup, ref string nameOrTargetUri)
+            return new AlertRuleResource(
+                id: "/subscriptions/a93fb07c-6c93-40be-bf3b-4f0deba10f4b/resourceGroups/Default-Web-EastUS/providers/microsoft.insights/alertrules/checkrule3-4b135401-a30c-4224-ae21-fa53a5bd253d",
+                location: "East US",
+                alertRuleResourceName: Name + "_Management",
+                isEnabled: true,
+                condition: condition)
+            {
+                Actions = new BindingList<RuleAction>()
+                {
+                    new RuleEmailAction(),
+                },
+                Description = null,
+                Tags = new Dictionary<string, string>()
+                {
+                    {"$type", "Microsoft.WindowsAzure.Management.Common.Storage.CasePreservedDictionary,Microsoft.WindowsAzure.Management.Common.Storage"},
+                    {"hidden-link:/subscriptions/a93fb07c-6c93-40be-bf3b-4f0deba10f4b/resourceGroups/Default-Web-EastUS/providers/microsoft.web/sites/garyyang1","Resource"}
+                },
+            };
+        }
+
+        public static IEnumerable<AlertRuleResource> InitializeRuleListResponse()
         {
-            // Calling with detailed output
-            cmdlet.DetailedOutput = true;
-            cmdlet.Name = null;
-            cmdlet.TargetResourceId = ResourceUri;
-            cmdlet.ExecuteCmdlet();
-
-            Assert.Equal(expectedResourceGroup, resourceGroup);
-            Assert.Equal(ResourceUri, nameOrTargetUri);
+            return new List<AlertRuleResource>
+            {
+                Utilities.CreateFakeRuleResource(),
+                Utilities.CreateFakeRuleResource(1),
+                Utilities.CreateFakeRuleResource(2)
+            };
         }
 
         public static void VerifyFieldAndValueInCall(string filter, string filedName, string fieldValue)
@@ -414,24 +474,30 @@ namespace Microsoft.Azure.Commands.Insights.Test
             VerifyConditionInFilter(filter: filter, field: filedName, value: fieldValue);
         }
 
-        public static void ExecuteVerifications(ManagementCmdletBase cmdlet, string expectedResourceGroup, ref string resourceGroup, ref string nameOrTargetUri)
+        public static void ExecuteVerifications(ManagementCmdletBase cmdlet, string expectedResourceGroup, ref string resourceGroup, ref string ruleName)
         {
             // Calling without optional parameters
             cmdlet.ExecuteCmdlet();
 
             VerifyFilterIsUsable(filter: resourceGroup);
             Assert.Equal(expectedResourceGroup, resourceGroup);
-            Assert.Null(nameOrTargetUri);
+            Assert.Null(ruleName);
 
             var typedCmdlet = cmdlet as GetAzureRmAlertRuleCommand;
             if (typedCmdlet != null)
             {
                 // Calling with Name
-                typedCmdlet.Name = Name;
+                typedCmdlet.Name = Utilities.Name;
                 typedCmdlet.ExecuteCmdlet();
 
                 Assert.Equal(expectedResourceGroup, resourceGroup);
-                Assert.Equal(Name, nameOrTargetUri);
+                Assert.Equal(Utilities.Name, ruleName);
+
+                typedCmdlet.DetailedOutput = true;
+                typedCmdlet.ExecuteCmdlet();
+
+                Assert.Equal(expectedResourceGroup, resourceGroup);
+                Assert.Equal(Utilities.Name, ruleName);
 
                 // Calling with ResourceUri
                 typedCmdlet.Name = null;
@@ -439,10 +505,13 @@ namespace Microsoft.Azure.Commands.Insights.Test
                 typedCmdlet.ExecuteCmdlet();
 
                 Assert.Equal(expectedResourceGroup, resourceGroup);
-                Assert.Equal(ResourceUri, nameOrTargetUri);
+                Assert.Null(ruleName);
 
-                // Calling with Detailed ouput and resourceuri
-                VerifyDetailedOutput(cmdlet: typedCmdlet, expectedResourceGroup: expectedResourceGroup, resourceGroup: ref resourceGroup, nameOrTargetUri: ref nameOrTargetUri);
+                typedCmdlet.DetailedOutput = false;
+                typedCmdlet.ExecuteCmdlet();
+
+                Assert.Equal(expectedResourceGroup, resourceGroup);
+                Assert.Null(ruleName);
             }
         }
 
