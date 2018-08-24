@@ -136,9 +136,11 @@
     <Compile Include="OutputClasses\PSMetricValuesCollection.cs" />
     <Compile Include="OutputClasses\PSMetricTabularResult.cs" />
     <Compile Include="OutputClasses\PSSmsReceiver.cs" />
+    <Compile Include="OutputClasses\PSSource.cs" />
     <Compile Include="OutputClasses\PSThresholdRuleCondition.cs" />
     <Compile Include="OutputClasses\PSToStringExtensions.cs" />
     <Compile Include="OutputClasses\PSWebhookReceiver.cs" />
+    <Compile Include="ScheduledQueryRules\NewScheduledQueryRuleSourceCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\ResourcesForAlertCmdlets.Designer.cs">
       <DependentUpon>ResourcesForAlertCmdlets.resx</DependentUpon>
@@ -181,6 +183,7 @@
     <Compile Include="TransitionalClasses\RuleWebhookAction.cs" />
     <Compile Include="TransitionalClasses\ScaleAction.cs" />
     <Compile Include="TransitionalClasses\ScaleCapacity.cs" />
+    <Compile Include="TransitionalClasses\Source.cs" />
     <Compile Include="TransitionalClasses\ThresholdRuleCondition.cs" />
     <Compile Include="TransitionalClasses\TimeAggregationOperator.cs" />
     <Compile Include="TransitionalClasses\TimeWindow.cs" />

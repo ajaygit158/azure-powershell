@@ -72,25 +72,7 @@ NestedModules = @('.\Microsoft.Azure.Commands.Insights.dll')
 FunctionsToExport = @()
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-CmdletsToExport = 'Get-AzureRmMetricDefinition', 'Get-AzureRmMetric', 
-               'Remove-AzureRmLogProfile', 'Get-AzureRmLogProfile', 
-               'Add-AzureRmLogProfile', 'Get-AzureRmLog', 
-               'Set-AzureRmDiagnosticSetting', 'Get-AzureRmDiagnosticSetting', 
-               'Remove-AzureRmDiagnosticSetting', 
-               'New-AzureRmAutoscaleNotification', 'New-AzureRmAutoscaleProfile', 
-               'New-AzureRmAutoscaleRule', 'Add-AzureRmAutoscaleSetting', 
-               'Get-AzureRmAutoscaleHistory', 'Get-AzureRmAutoscaleSetting', 
-               'New-AzureRmAutoscaleWebhook', 'Remove-AzureRmAutoscaleSetting', 
-               'Add-AzureRmMetricAlertRule', 'Add-AzureRmWebtestAlertRule', 
-               'Get-AzureRmAlertHistory', 'Get-AzureRmAlertRule', 
-               'New-AzureRmAlertRuleEmail', 'New-AzureRmAlertRuleWebhook', 
-               'Remove-AzureRmAlertRule', 'Set-AzureRmActivityLogAlert', 
-               'Get-AzureRmActivityLogAlert', 'New-AzureRmActionGroup', 
-               'New-AzureRmActivityLogAlertCondition', 
-               'Enable-AzureRmActivityLogAlert', 'Disable-AzureRmActivityLogAlert', 
-               'Remove-AzureRmActivityLogAlert', 'New-AzureRmActionGroupReceiver', 
-               'Set-AzureRmActionGroup', 'Get-AzureRmActionGroup', 
-               'Remove-AzureRmActionGroup', 'New-AzureRmMetricFilter'
+CmdletsToExport = 'New-AzScheduledQueryRuleSource'
 
 # Variables to export from this module
 # VariablesToExport = @()

@@ -72,25 +72,7 @@ NestedModules = @('.\Microsoft.Azure.Commands.Insights.dll')
 FunctionsToExport = @()
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-CmdletsToExport = 'Get-AzMetricDefinition', 'Get-AzMetric', 
-    'Remove-AzLogProfile', 'Get-AzLogProfile', 
-    'Add-AzLogProfile', 'Get-AzLog', 
-    'Set-AzDiagnosticSetting', 'Get-AzDiagnosticSetting', 
-    'Remove-AzDiagnosticSetting',
-    'New-AzAutoscaleNotification', 'New-AzAutoscaleProfile', 
-    'New-AzAutoscaleRule', 'Add-AzAutoscaleSetting', 
-    'Get-AzAutoscaleHistory', 'Get-AzAutoscaleSetting', 
-    'New-AzAutoscaleWebhook', 'Remove-AzAutoscaleSetting', 
-    'Add-AzMetricAlertRule', 'Add-AzWebtestAlertRule', 
-    'Get-AzAlertHistory', 'Get-AzAlertRule', 
-    'New-AzAlertRuleEmail', 'New-AzAlertRuleWebhook', 
-    'Remove-AzAlertRule', 'Set-AzActivityLogAlert', 
-    'Get-AzActivityLogAlert', 'New-AzActionGroup', 
-    'New-AzActivityLogAlertCondition', 
-    'Enable-AzActivityLogAlert', 'Disable-AzActivityLogAlert', 
-    'Remove-AzActivityLogAlert', 'New-AzActionGroupReceiver', 
-    'Set-AzActionGroup', 'Get-AzActionGroup', 
-    'Remove-AzActionGroup', 'New-AzMetricFilter'
+CmdletsToExport = 'New-AzScheduledQueryRuleSource'
 
 # Variables to export from this module
 # VariablesToExport = @()
